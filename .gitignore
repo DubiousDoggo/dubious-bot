@@ -1,0 +1,5 @@
+*.js
+*.json
+!default.json
+node_modules
+auth.json
