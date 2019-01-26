@@ -12,15 +12,15 @@ export default {
 			if(message.mentions.roles.size <= 0)
 				return reject('No roles mentioned')
 
-			const newUser = message.member.roles.size == 0
+			const newUser = message.member.roles.size === 0
 			const [assign, unassigned] = message.mentions.roles.partition((_role, id) => serverConfig.assignableRoles.has(id))
 			message.member.addRoles(assign, 'user requested')
 		
 			if(unassigned.size === 0) {
-				message.channel.send(`All done!${newUser?`\nWelcome to ${[message.guild.name, 'the server'][weightedRandom(1,1)]}!`:``}`)
+				message.channel.send(`All done!${newUser?`\nWelcome ${[`to ${message.guild.name}!`, `to the server`][weightedRandom(1,1)]}`:``}`)
 			} else {
 				message.channel.send(`${humanList(unassigned.map(role => role.name),'is not an assignable role','are not assignable roles')}`
-														+`\nYou can check the list of roles using ${serverConfig.commandPrefix}lasr`)
+														+`\nYou can check the list of roles using \`${serverConfig.commandPrefix}lasr\``)
 			}
 			return resolve()
 		})

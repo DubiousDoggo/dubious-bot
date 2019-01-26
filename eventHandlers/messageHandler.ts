@@ -9,7 +9,7 @@ export default async (message: Message, client: DubiousBot) => {
 	
 		// TODO handle DMs
 		if(!(message.channel instanceof TextChannel)) {
-			message.channel.send(`Hello, I'm ${client.user.username}\nI'm not set up to hande DMs yet, but you can go bother <@${client.auth.developerID}> to add stuff if you want`)
+			message.channel.send(`Hello, I'm ${client.user.username}\nI'm not set up to hande DMs yet, but you can go bother <@${client.auth.developerID}> to fix stuff if you want`)
 			console.debug(message)
 			return resolve()
 		}
@@ -41,11 +41,11 @@ export default async (message: Message, client: DubiousBot) => {
 					.catch( reason => { message.channel.send(`${reason}\nUsage: ${command.name} ${command.usage}`) })
 
 			} else {
-				message.channel.send(`Unknown command '${cmd}'\nType ${serverConfig.commandPrefix}help for a list of commands`)
+				message.channel.send(`Unknown command '${cmd}'\nType \`${serverConfig.commandPrefix}help\` for a list of commands`)
 				return resolve()
 			}
 		}	else if(message.isMentioned(client.user)) {
-			message.channel.send(`Hello, I'm ${client.user.username}\nPlease type ${serverConfig.commandPrefix}help for a list of available commands`)
+			message.channel.send(`Hello, I'm ${client.user.username}\nPlease type \`${serverConfig.commandPrefix}help\` for a list of available commands`)
 		}	
 	})
 }

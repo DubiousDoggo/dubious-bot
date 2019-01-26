@@ -73,7 +73,9 @@ export class DubiousBot extends Discord.Client {
 	}
 
 	private initCommands = () => {
-		fs.readdirSync('./commands', fileEncoding).filter( fileName => !fileName.startsWith('.') && fileName.endsWith('.js')).forEach(fileName => {
+		fs.readdirSync('./commands', fileEncoding)
+			.filter( fileName => !fileName.startsWith('.') && fileName.endsWith('.js') )
+			.forEach(fileName => {
 			const command = require(`./commands/${fileName}`).default as Command
 			if(this.commands.has(command.name))
 				throw Error(`Command name collision ${command.name}`)
@@ -90,7 +92,7 @@ export class DubiousBot extends Discord.Client {
 		fs.readFile(`./configs/${guild.id}.json`, fileEncoding, (err: NodeJS.ErrnoException, data: string) => {
 			if (err) {
 				if (err.code == 'ENOENT') {
-					logger.debug(`No config file exists for server id '${guild.id}', loading default config`)
+					logger.debug(`No config file exists for server id ${guild.id}, loading default config`)
 					data = fs.readFileSync('./configs/default.json', fileEncoding)
 				} else {
 					throw err

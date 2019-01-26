@@ -45,7 +45,7 @@ export default {
 				
 				reply = reply.replace(/TODO/m, `TODO <@${client.auth.developerID}> finish your documentation you lazy shit`).replace(/TODO(?<!\/\/)/gm, '//TODO')
 					
-				message.channel.send(reply);
+				message.channel.send(reply)
 				
 			} else {
 				message.channel.send(`Unknown command '${args[0]}'\nType ${config.commandPrefix}help for a list of comands`)
