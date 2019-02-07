@@ -2,6 +2,7 @@
 *.json
 !default.json
 !package.json
+!package-lock.json
 !tsconfig.json
 node_modules
 auth.json
