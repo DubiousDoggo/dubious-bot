@@ -6,7 +6,7 @@ export default {
 	level: 'user',
 	desc: 'Play a friendly game of Ping Pong',
 	usage: '',
-	execute: async (message, _a, _c, client) => {
+	execute: async (message, _args, _config, client) => {
 		return message.channel.send(`Pong! ${client.ping}ms`)
 	}
 } as Command
