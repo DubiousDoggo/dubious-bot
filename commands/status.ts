@@ -8,17 +8,16 @@ export default {
 	alias: [],
 	level: 'user',
 	desc: 'Gives a list of things about the bot',
-  usage: '',
-  execute: async (message: Message, _args: string[], _serverConfig: ConfigFile, client: DubiousBot) => {
-
+	usage: '',
+	execute: async (message: Message, _args: string[], _serverConfig: ConfigFile, client: DubiousBot) => {
 		const embed = new RichEmbed()
 			.setColor('RANDOM')
-      .setTitle(`**Bot Status**`)
-      .setThumbnail(client.user.avatarURL)
-      .addField(`**The bot is in:**`, `${client.guilds.size} servers`, true)
+			.setTitle(`**Bot Status**`)
+			.setThumbnail(client.user.avatarURL)
+			.addField(`**The bot is in:**`, `${client.guilds.size} servers`, true)
 			.addField(`**Ping:**`, `${client.ping}ms`, true)
 			.addField(`**Uptime:**`, `${timeString(client.uptime)}`)
 			.setTimestamp(new Date())
-    return message.channel.send(embed)
-  }
+		return message.channel.send(embed)
+	}
 } as Command

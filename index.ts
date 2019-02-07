@@ -1,6 +1,5 @@
 /*
  * TODO LIST
- * Figure out repository
  * Fix documentation
  * Set up dependencies
  * Make output fancy
@@ -55,8 +54,8 @@ export class DubiousBot extends Discord.Client {
 		this.on('ready', () => {
 			logger.info('Connected')
 			      .info(`Logged in as: ${this.user.tag}`)
-						.debug(`id: ${this.user.id}`)
-			
+			      .debug(`id: ${this.user.id}`)
+
 			logger.info('Loading configs')
 			this.guilds.forEach(guild => this.loadConfig(guild))
 		})
@@ -74,8 +73,8 @@ export class DubiousBot extends Discord.Client {
 
 	private initCommands = () => {
 		fs.readdirSync('./commands', fileEncoding)
-			.filter( fileName => !fileName.startsWith('.') && fileName.endsWith('.js') )
-			.forEach(fileName => {
+		  .filter( fileName => !fileName.startsWith('.') && fileName.endsWith('.js') )
+		  .forEach(fileName => {
 			const command = require(`./commands/${fileName}`).default as Command
 			if(this.commands.has(command.name))
 				throw Error(`Command name collision ${command.name}`)
@@ -92,7 +91,7 @@ export class DubiousBot extends Discord.Client {
 		fs.readFile(`./configs/${guild.id}.json`, fileEncoding, (err: NodeJS.ErrnoException, data: string) => {
 			if (err) {
 				if (err.code == 'ENOENT') {
-					logger.debug(`No config file exists for server id ${guild.id}, loading default config`)
+					logger.debug(`No config file exists for guild id ${guild.id}, loading default config`)
 					data = fs.readFileSync('./configs/default.json', fileEncoding)
 				} else {
 					throw err
@@ -108,7 +107,7 @@ export class DubiousBot extends Discord.Client {
 					.map<[Snowflake, Role]>(id => [id, guild.roles.get(id) as Role]))
 			else 
 				config.adminRoles = new Collection<Snowflake, Role>()
-				
+			
 			if(configData.assignableRoles instanceof Array)
 				config.assignableRoles = new Collection<Snowflake, Role>(
 					(configData.assignableRoles as Array<Snowflake>)
@@ -117,16 +116,16 @@ export class DubiousBot extends Discord.Client {
 				)
 			else
 				config.assignableRoles = new Collection<Snowflake, Role>()
-
+			
 			this.configs.set(guild.id, config)
-
+			
 			this.saveConfig(guild.id)
-			logger.debug(`loaded config for server id ${guild.id}`)
+			logger.debug(`loaded config for guild id ${guild.id}`)
 		})
 	}
 
 	saveConfig = (id: Snowflake) => {
-		logger.debug(`saving config for server id ${id}`)
+		logger.debug(`saving config for guild id ${id}`)
 		let data = JSON.stringify(this.configs.get(id),(_key, value) => value instanceof Collection ? value.keyArray() : value, 2)
 		fs.writeFileSync(`./configs/${id}.json`, data)
 	}

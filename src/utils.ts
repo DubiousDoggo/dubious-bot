@@ -11,7 +11,7 @@ export const humanList = (list: string[], singular = '', plural = '', conjunc = 
 }
 
 export const weightedRandom = (...weights: number[]): number => {
-	let total = weights.reduce((t,i) => { return t + i })
+	let total = weights.reduce((t,i) => t + i )
 	let r = Math.floor(Math.random() * total)
 	for (let i = 0; i < weights.length; i++) {
 		if (r < weights[i])

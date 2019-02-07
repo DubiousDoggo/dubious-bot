@@ -14,14 +14,15 @@ export default {
 			if(args.length > 1)
 				return reject('Too many arguments')
 			
-			if(args.length === 0) {	
+			if(args.length === 0) {
 				let embed = new RichEmbed()
 					.setTitle('**Here is the list of available commands**')
 					//.setAuthor(client.user.username, client.user.avatarURL)
 					.setThumbnail(message.guild.iconURL)
 					.setColor('RANDOM')
 					.setFooter('psst, go yell at Dubious to finish his documentation')
-				client.commands.filter(command => levelcmp(command.level, message.member, client) <= 0).forEach( command => embed.addField(`**${command.name.concat(command.alias.length?`, ${command.alias.join(', ')}`:``)}**`, command.desc) )
+				client.commands.filter(command => levelcmp(command.level, message.member, client) <= 0)
+				               .forEach(command => embed.addField(`**${command.name.concat(command.alias.length?`, ${command.alias.join(', ')}`:``)}**`, command.desc))
 				message.channel.send(embed)
 				return resolve()
 			}
