@@ -1,0 +1,15 @@
+{
+  "name": "dubious-bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Dubious Doggo",
+  "dependencies": {
+    "bufferutil": "^3.0.3",
+    "discord.js": "^11.4.2",
+    "typescript": "^3.0.1",
+    "winston": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^10.5.4"
+  }
+}
