@@ -20,7 +20,7 @@ export default {
 					//.setAuthor(client.user.username, client.user.avatarURL)
 					.setThumbnail(message.guild.iconURL)
 					.setColor('RANDOM')
-					.setFooter('psst, go yell at Dubious to finish his documentation')
+					//.setFooter('psst, go yell at Dubious to finish his documentation')
 				client.commands.filter(command => levelcmp(command.level, message.member, client) <= 0)
 				               .forEach(command => embed.addField(`**${command.name.concat(command.alias.length?`, ${command.alias.join(', ')}`:``)}**`, command.desc))
 				message.channel.send(embed)

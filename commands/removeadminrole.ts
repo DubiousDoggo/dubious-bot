@@ -4,7 +4,7 @@ export default {
 	name: 'removeadminrole',
 	alias: ['radr'],
 	level: 'admin',
-	desc: 'TODO',
+	desc: 'Revokes a role\'s access to admin commands.\n*Warning: this may revoke admin access from yourself!*',
 	usage: '@role [...@role]',
 	execute: async (message, _args, serverConfig, client) => {
 		if (message.mentions.roles.size <= 0)

@@ -4,7 +4,7 @@ export default {
 	name: 'listadminroles',
 	alias: ['ladr'],
 	level: 'admin',
-	desc: 'TODO',
+	desc: 'Displays the list of authorized admin roles.',
 	usage: '',
 	execute: async (message, _args, serverConfig) => {
 		return new Promise<void>((resolve, reject) => {

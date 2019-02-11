@@ -5,7 +5,7 @@ export default {
 	name: 'addassignablerole',
 	alias: ['aasr'],
 	level: 'admin',
-	desc: 'TODO',
+	desc: 'Adds a role to the list of assignable roles. Users will be able to self-assign and remove the listed roles using the giverole and removerole commands.',
 	usage: '@role [...@role]',
 	execute: async (message, _args, serverConfig, client) => {
 		return new Promise<void>((resolve, reject) => {

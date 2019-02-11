@@ -4,7 +4,7 @@ export default {
 	name: 'removeassignablerole',
 	alias: ['rasr'],
 	level: 'admin',
-	desc: 'TODO',
+	desc: 'Removes a role from being self-assignable.',
 	usage: '@role [...@role]',
 	execute: async (message, _args, serverConfig, client) => {
 		if (message.mentions.roles.size <= 0)

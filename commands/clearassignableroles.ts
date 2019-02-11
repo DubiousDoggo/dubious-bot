@@ -4,7 +4,7 @@ export default {
 	name: 'clearassignableroles',
 	alias: ['casr'],
 	level: 'admin',
-	desc: 'TODO',
+	desc: 'Clears the list of self-assignable roles.',
 	usage: '',
 	execute: async (message, args, serverConfig, client) => {
 		return new Promise<void>((resolve, reject) => {
