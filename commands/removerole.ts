@@ -3,7 +3,7 @@ import { humanList } from "../src/utils";
 
 export default {
 	name: 'removerole',
-	alias: ['removeroles', 'rem'],
+	alias: ['removeroles', 'rem', 'remrole'],
 	level: 'user',
 	desc: 'Removes roles from the user.\nThe roles mentioned must be in the assignable roles list.',
 	usage: '@role [...@roles]',

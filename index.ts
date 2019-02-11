@@ -73,7 +73,7 @@ export class DubiousBot extends Discord.Client {
 
 	private initCommands = () => {
 		fs.readdirSync('./commands', fileEncoding)
-		  .filter( fileName => !fileName.startsWith('.') && fileName.endsWith('.js') )
+		  .filter( fileName => !fileName.startsWith('_') && fileName.endsWith('.js') )
 		  .forEach(fileName => {
 			const command = require(`./commands/${fileName}`).default as Command
 			if(this.commands.has(command.name))

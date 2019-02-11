@@ -4,7 +4,7 @@ export default {
 	name: 'clearadminroles',
 	alias: ['cadr'],
 	level: 'admin',
-	desc: 'TODO',
+	desc: 'Clears the list of admin roles.\n*Warning: This command may revoke admin access from yourself.*',
 	usage: '',
 	execute: async (message, args, serverConfig, client) => {
 		return new Promise<void>((resolve, reject) => {

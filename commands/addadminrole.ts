@@ -4,7 +4,7 @@ export default {
 	name: 'addadminrole',
 	alias: ['aadr'],
 	level: 'admin',
-	desc: 'TODO',
+	desc: 'Adds a role to the list of admin roles.\nThis only gives the role access to admin bot commands, not server access.',
 	usage: '@role [...@role]',
 	execute: async (message, _args, serverConfig, client) => {
 		return new Promise<void>((resolve, reject) => {
