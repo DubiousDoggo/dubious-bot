@@ -1,5 +1,6 @@
 /*
  * TODO LIST
+ * Add message logger
  * Fix documentation
  * Set up dependencies
  * Make output fancy
@@ -10,7 +11,7 @@ import Discord, { Collection, Snowflake, Message, Role, Guild } from 'discord.js
 import messageHandler from './eventHandlers/messageHandler'
 import roleDeleteHandler from './eventHandlers/roleDeleteHandler'
 
-export type permissionLevel = 'user' | 'mod' | 'admin' | 'dev'
+export type permissionLevel = 'user' | 'admin' | 'dev'
 
 export interface Command {
 	name: string
@@ -22,6 +23,7 @@ export interface Command {
 }
 export interface ConfigFile {
 	commandPrefix: string
+	enableLogger: boolean
 	assignableRoles: Collection<Snowflake, Role>
 	adminRoles: Collection<Snowflake, Role>
 }

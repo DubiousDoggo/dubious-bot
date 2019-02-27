@@ -41,7 +41,6 @@ export const getComputedLevel = (level: permissionLevel | GuildMember, client: D
 
 	switch(level) {
 		case 'user' : return 0
-		case 'mod'  : return 1
 		case 'admin': return 2
 		case 'dev'  : return 3
 	}
