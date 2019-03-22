@@ -10,7 +10,8 @@
     "bufferutil": "^3.0.3",
     "discord.js": "^11.4.2",
     "typescript": "^3.3.3333",
-    "winston": "^3.0.0"
+    "winston": "^3.0.0",
+    "lodash": "^4.17.11"
   },
   "devDependencies": {
     "@types/node": "^10.14.1"
