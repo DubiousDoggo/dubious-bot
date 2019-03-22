@@ -29,7 +29,7 @@ export interface ConfigFile {
 	loggerChannelID: Snowflake
 	assignableRoles: Collection<Snowflake, Role>
 	adminRoles: Collection<Snowflake, Role>
-
+	disabledCommands: Set<string>
 }
 
 export const logger = winston.createLogger({
@@ -126,6 +126,11 @@ export class DubiousBot extends Discord.Client {
 			else
 				config.assignableRoles = new Collection<Snowflake, Role>()
 			
+			if(configData.disabledCommands instanceof Array)
+				config.disabledCommands = new Set(configData.disabledCommands)
+			else
+				config.disabledCommands = new Set()
+
 			this.configs.set(guild.id, config)
 			
 			this.saveConfig(guild.id)
@@ -135,7 +140,10 @@ export class DubiousBot extends Discord.Client {
 
 	saveConfig = (id: Snowflake) => {
 		logger.debug(`saving config for guild id ${id}`)
-		let data = JSON.stringify(this.configs.get(id),(_key, value) => value instanceof Collection ? value.keyArray() : value, 2)
+		let data = JSON.stringify(this.configs.get(id),(_key, value) => 
+			value instanceof Collection ? value.keyArray() : 
+			value instanceof Set ? [...value] :
+			value, 2)
 		fs.writeFileSync(`./configs/${id}.json`, data)
 	}
 }
