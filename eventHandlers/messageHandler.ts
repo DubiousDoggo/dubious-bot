@@ -1,6 +1,7 @@
 import { Message, TextChannel } from "discord.js";
-import { DubiousBot, ConfigFile, Command } from "..";
+import { DubiousBot, logger } from "..";
 import { getComputedLevel } from "../src/utils";
+import sqlite3 from "sqlite3";
 
 export default async (message: Message, client: DubiousBot) => {
 	return new Promise<void>((resolve, reject) => {
@@ -14,22 +15,35 @@ export default async (message: Message, client: DubiousBot) => {
 			return resolve()
 		}
 
-		if (!client.configs.has(message.guild.id))
-			reject(new Error(`No config file exists for guild id ${message.guild.id}`))
-		
-		let serverConfig = client.configs.get(message.guild.id) as ConfigFile
+		let serverConfig = client.configs.get(message.guild.id)
 
+		if (serverConfig === undefined)
+			return reject(new Error(`No config file exists for guild id ${message.guild.id}`))
+
+		if (serverConfig.enableLogger) {
+			/*
+			let db = new sqlite3.Database(`./db/${message.guild.id}.db`, err => {
+				if(err)
+					logger.error(err.message)
+			})
+
+			db.prepare
+
+			db.close()
+			*/
+		}
+		
 		if (message.content.startsWith(serverConfig.commandPrefix)) {
 
 			let args = message.content.substring(serverConfig.commandPrefix.length).split(' ')
 			let cmd = args[0].toLowerCase()
 			args = args.splice(1)
-
+			
 			if(client.aliasMap.has(cmd)) 
-				cmd = client.aliasMap.get(cmd) as string
+				cmd = client.aliasMap.get(cmd)!
 
 			if(client.commands.has(cmd)) {
-				let command = client.commands.get(cmd) as Command
+				let command = client.commands.get(cmd)!
 
 				if (getComputedLevel(command.level,client) > getComputedLevel(message.member,client)) {
 					message.channel.send(`This command if for ${command.level} use only`)

@@ -10,6 +10,8 @@ import fs from 'fs'
 import Discord, { Collection, Snowflake, Message, Role, Guild } from 'discord.js'
 import messageHandler from './eventHandlers/messageHandler'
 import roleDeleteHandler from './eventHandlers/roleDeleteHandler'
+import messageUpdateHandler from './eventHandlers/messageUpdateHandler';
+import messageDeleteHandler from './eventHandlers/messageDeleteHandler';
 
 export type permissionLevel = 'user' | 'admin' | 'dev'
 
@@ -24,8 +26,10 @@ export interface Command {
 export interface ConfigFile {
 	commandPrefix: string
 	enableLogger: boolean
+	loggerChannelID: Snowflake
 	assignableRoles: Collection<Snowflake, Role>
 	adminRoles: Collection<Snowflake, Role>
+
 }
 
 export const logger = winston.createLogger({
@@ -66,8 +70,11 @@ export class DubiousBot extends Discord.Client {
 
 		this.on('guildCreate', guild => this.loadConfig(guild))
 		this.on('roleDelete', role => roleDeleteHandler(role, this))
+
 		this.on('message', message => messageHandler(message, this).catch(error => logger.error(error.stack)))
-		
+		this.on('messageUpdate', (oldmessage, newmessage) => messageUpdateHandler(oldmessage, newmessage, this).catch(error => logger.error(error.stack)))
+		this.on('messageDelete', message => messageDeleteHandler(message, this).catch(error => logger.error(error.stack)))
+
 		this.on('error', error => logger.error(`${error.stack}`))
 		this.on('warn', info => logger.warn(info))
 		this.on('debug', info => (/heartbeat/ig.test(info) ? logger.silly : logger.debug)(info))
