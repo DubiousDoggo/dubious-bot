@@ -7,11 +7,13 @@
  */
 import winston from 'winston'
 import fs from 'fs'
-import Discord, { Collection, Snowflake, Message, Role, Guild } from 'discord.js'
+import Discord, { Collection, Snowflake, Message, Role, Guild, MessageMentions } from 'discord.js'
 import messageHandler from './eventHandlers/messageHandler'
 import roleDeleteHandler from './eventHandlers/roleDeleteHandler'
 import messageUpdateHandler from './eventHandlers/messageUpdateHandler';
 import messageDeleteHandler from './eventHandlers/messageDeleteHandler';
+import guildMemberAddHandler from './eventHandlers/guildMemberAddHandler';
+import guildMemberRemoveHandler from './eventHandlers/guildMemberRemoveHandler';
 
 export type permissionLevel = 'user' | 'admin' | 'dev'
 
@@ -71,6 +73,9 @@ export class DubiousBot extends Discord.Client {
 		this.on('guildCreate', guild => this.loadConfig(guild))
 		this.on('roleDelete', role => roleDeleteHandler(role, this))
 
+		this.on('guildMemberAdd', member => guildMemberAddHandler(member, this))
+		this.on('guildMemberRemove', member => guildMemberRemoveHandler(member, this))
+
 		this.on('message', message => messageHandler(message, this).catch(error => logger.error(error.stack)))
 		this.on('messageUpdate', (oldmessage, newmessage) => messageUpdateHandler(oldmessage, newmessage, this).catch(error => logger.error(error.stack)))
 		this.on('messageDelete', message => messageDeleteHandler(message, this).catch(error => logger.error(error.stack)))
@@ -80,7 +85,8 @@ export class DubiousBot extends Discord.Client {
 		this.on('debug', info => (/heartbeat/ig.test(info) ? logger.silly : logger.debug)(info))
 	}
 
-	private initCommands = () => {
+	initCommands = () => {
+		logger.info('Loading Commands')
 		fs.readdirSync('./commands', fileEncoding)
 		  .filter( fileName => !fileName.startsWith('_') && fileName.endsWith('.js') )
 		  .forEach(fileName => {

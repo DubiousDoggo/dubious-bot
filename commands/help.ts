@@ -17,11 +17,10 @@ export default {
 			if(args.length === 0) {
 				let embed = new RichEmbed()
 					.setTitle('**Here is the list of available commands**')
-					//.setAuthor(client.user.username, client.user.avatarURL)
 					.setThumbnail(message.guild.iconURL)
 					.setColor('RANDOM')
 					//.setFooter('psst, go yell at Dubious to finish his documentation')
-				client.commands.filter(command => levelcmp(command.level, message.member, client) <= 0)
+				client.commands.filter(command => !config.disabledCommands.has(command.name) && levelcmp(command.level, message.member, client) <= 0)
 				               .forEach(command => embed.addField(`**${command.name.concat(command.alias.length?`, ${command.alias.join(', ')}`:``)}**`, command.desc))
 				message.channel.send(embed)
 				return resolve()
@@ -43,8 +42,6 @@ export default {
 					reply += (`\nThis command is for ${command.level} use only`)
 			
 				reply += (`\nUsage: ${command.name} ${command.usage}`)
-				
-				reply = reply.replace(/TODO/m, `TODO <@${client.auth.developerID}> finish your documentation you lazy shit`).replace(/TODO(?<!\/\/)/gm, '//TODO')
 					
 				message.channel.send(reply)
 				
