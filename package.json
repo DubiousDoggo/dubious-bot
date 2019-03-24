@@ -2,8 +2,8 @@
   "name": "dubious-bot",
   "description": "A discord bot custom made for Duff's",
   "repository": "https://github.com/DubiousDoggo/dubious-bot",
-  "license": "IDK",
-  "version": "1.1.0",
+  "license": "WTFPL",
+  "version": "1.2.0",
   "main": "index.js",
   "author": "Dubious Doggo",
   "dependencies": {

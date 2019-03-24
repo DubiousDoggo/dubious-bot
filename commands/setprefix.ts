@@ -5,7 +5,7 @@ export default {
 	alias: ['spf'],
 	level: 'admin',
 	desc: 'Set the command prefix.',
-	usage: 'prefix',
+	usage: '<prefix>',
 	execute: async (message, args, serverConfig, client) => {
 		return new Promise<void>((resolve, reject) => {
 			if (args.length <= 0)

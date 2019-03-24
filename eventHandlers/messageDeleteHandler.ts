@@ -25,13 +25,11 @@ export default async (message: Message, client: DubiousBot) => {
 			embed.setDescription(`\u25baMessage\n\`${message.content}\``)
 			.addField(`\u200B`,
 				`\u25baChannel : <#${message.channel.id}>\n` +
-				`\u25baCreated : ${message.createdAt}\n` +
 				`\u25baID : ${message.id}`)
 		else 
 			embed.setDescription(
 				`\u25baMessage : \`${message.content}\`\n` +
 				`\u25baChannel : <#${message.channel.id}>\n` +
-				`\u25baCreated : ${message.createdAt.toISOString()}\n` +
 				`\u25baID : ${message.id}`)
 
 		log.send(`Message was deleted in <#${message.channel.id}>`, embed)

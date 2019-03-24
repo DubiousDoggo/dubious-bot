@@ -6,11 +6,11 @@ export default {
 	alias: ['giveroles', 'give'],
 	level: 'user',
 	desc: 'Gives the user some roles.\nThe roles mentioned must be in the assignable roles list.',
-	usage: '@role [...@roles]',
+	usage: '<@role> [...@roles]',
 	execute: async (message, _args, serverConfig) => {
 		return new Promise<void>((resolve, reject) => {
 			if(message.mentions.roles.size <= 0)
-				return reject('No roles mentioned')
+				return reject('Missing required arguments')
 
 			const newUser = message.member.roles.size === 0
 			const [assign, unassigned] = message.mentions.roles.partition((_role, id) => serverConfig.assignableRoles.has(id))
