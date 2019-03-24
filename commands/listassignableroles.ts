@@ -9,7 +9,7 @@ export default {
 	execute: async (message, args, serverConfig) => {
 		return new Promise<void>((resolve, reject) => {
 			if (args.length > 0)
-				return reject('Too many arguments')
+				return reject(`Invalid argument '${args[0]}'`)
 
 			if (serverConfig.assignableRoles.size > 0) {
 				let reply = 'The current assignable roles are'

@@ -6,10 +6,10 @@ export default {
 	alias: ['aasr'],
 	level: 'admin',
 	desc: 'Adds a role to the list of assignable roles.\nUsers will be able to self-assign and remove the listed roles using the giverole and removerole commands.',
-	usage: '@role [...@role]',
+	usage: '<...@role>',
 	execute: async (message, _args, serverConfig, client) => {
 		return new Promise<void>((resolve, reject) => {
-			if (message.mentions.roles.size <= 0) 
+			if (message.mentions.roles.size < 1) 
 				return reject('No roles mentioned')
 			
 			let reply: string = ''

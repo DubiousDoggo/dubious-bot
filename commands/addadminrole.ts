@@ -5,11 +5,11 @@ export default {
 	alias: ['aadr'],
 	level: 'admin',
 	desc: 'Adds a role to the list of admin roles.\nThis only gives the role access to admin bot commands, not server access.',
-	usage: '@role [...@role]',
+	usage: '<...@role>',
 	execute: async (message, _args, serverConfig, client) => {
 		return new Promise<void>((resolve, reject) => {
-			if (message.mentions.roles.size <= 0) 
-				return reject('No roles mentioned')
+			if (message.mentions.roles.size < 1) 
+				return reject('Missing required arguments')
 			
 			let reply: string = ''
 			message.mentions.roles.forEach(((role, id) => {

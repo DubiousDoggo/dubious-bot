@@ -6,7 +6,7 @@ export default {
 	alias: ['removeroles', 'rem', 'remrole'],
 	level: 'user',
 	desc: 'Removes roles from the user.\nThe roles mentioned must be in the assignable roles list.',
-	usage: '@role [...@roles]',
+	usage: '<...@roles>',
 	execute: async (message, _args, serverConfig) => {
 		return new Promise<void>((resolve, reject) => {
 			if(message.mentions.roles.size <= 0)

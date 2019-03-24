@@ -5,7 +5,7 @@ export default {
 	alias: ['rasr'],
 	level: 'admin',
 	desc: 'Removes a role from being self-assignable.',
-	usage: '@role [...@role]',
+	usage: '<...@role>',
 	execute: async (message, _args, serverConfig, client) => {
 		if (message.mentions.roles.size <= 0)
 			return Promise.reject('No roles specified')

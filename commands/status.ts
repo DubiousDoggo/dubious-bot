@@ -11,13 +11,13 @@ export default {
 	usage: '',
 	execute: async (message: Message, _args: string[], _serverConfig: ConfigFile, client: DubiousBot) => {
 		const embed = new RichEmbed()
-			.setColor('RANDOM')
-			.setTitle(`**Bot Status**`)
+			.setTitle(`Bot Status`)	
 			.setThumbnail(client.user.avatarURL)
-			.addField(`**The bot is in:**`, `${client.guilds.size} servers`, true)
-			.addField(`**Ping:**`, `${client.ping}ms`, true)
-			.addField(`**Uptime:**`, `${timeString(client.uptime)}`)
 			.setTimestamp(new Date())
+			.setColor('BLUE')
+			.addField(`The bot is in:`, `${client.guilds.size} servers`, true)
+			.addField(`Ping:`, `${client.ping}ms`, true)
+			.addField(`Uptime:`, `${timeString(client.uptime)}`, true)
 		return message.channel.send(embed)
 	}
 } as Command

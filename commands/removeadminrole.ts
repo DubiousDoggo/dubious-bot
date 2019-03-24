@@ -5,7 +5,7 @@ export default {
 	alias: ['radr'],
 	level: 'admin',
 	desc: 'Revokes a role\'s access to admin commands.\n*Warning: this may revoke admin access from yourself!*',
-	usage: '@role [...@role]',
+	usage: '<...@role>',
 	execute: async (message, _args, serverConfig, client) => {
 		if (message.mentions.roles.size <= 0)
 			return Promise.reject('No roles specified')

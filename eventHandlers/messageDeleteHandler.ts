@@ -17,20 +17,14 @@ export default async (message: Message, client: DubiousBot) => {
 		const embed = new RichEmbed()
 			.setAuthor(message.author.tag, message.author.avatarURL)
 			.setTitle('Message was deleted')
-			.setFooter(client.user.tag, client.user.avatarURL)
+			.setFooter(client.user.username, client.user.avatarURL)
 			.setTimestamp(new Date())
 			.setColor('DARK_PURPLE')
-		
-		if(message.content.length > 1024) 
-			embed.setDescription(`\u25baMessage\n\`${message.content}\``)
-			.addField(`\u200B`,
-				`\u25baChannel : <#${message.channel.id}>\n` +
-				`\u25baID : ${message.id}`)
-		else 
-			embed.setDescription(
+			.setDescription(
 				`\u25baMessage : \`${message.content}\`\n` +
 				`\u25baChannel : <#${message.channel.id}>\n` +
-				`\u25baID : ${message.id}`)
+				`\u25baID : ${message.id}\n` +
+				`\u25baSent : ${message.createdAt.toUTCString()}`)
 
 		log.send(`Message was deleted in <#${message.channel.id}>`, embed)
 	})

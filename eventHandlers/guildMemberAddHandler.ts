@@ -13,15 +13,16 @@ export default async (member: GuildMember, client: DubiousBot) => {
 
 		if (!(log instanceof TextChannel))
 			return reject(`logger channel does not exist for guild ${member.guild.id}`)
+			
 		const embed = new RichEmbed()
 			.setAuthor(member.user.tag, member.user.avatarURL)
 			.setTitle('User has joined')
+			.setFooter(client.user.username, client.user.avatarURL)
+			.setTimestamp(new Date())
+			.setColor('AQUA')
 			.setDescription(
 				`\u25baName: ${member.user.tag}\n` +
 				`\u25baJoined: ${member.joinedAt.toUTCString()}`)
-			.setFooter(client.user.tag, client.user.avatarURL)
-			.setTimestamp(new Date())
-			.setColor('AQUA')
 		
 		log.send(`${member.user.tag} has joined`, embed)
 	})

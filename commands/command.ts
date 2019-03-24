@@ -6,27 +6,29 @@ export default {
 	alias: ['cmd'],
 	level: 'admin',
 	desc: 'Enables or disables commands',
-	usage: '[enable/disable, <command-name>, ...[command-name]]',
+	usage: '[<enable|disable> <...command-name>]',
 	execute: async (message, args, serverConfig, client) => {
 		return new Promise<void>((resolve, reject) => {
+			if(args.length > 0) {
+				if (args[0] !== 'enable' && args[0] !== 'disable')
+					return reject(`Invalid argument '${args[0]}'`)
+				if (args.length < 2)
+					return reject('Missing required arguments')
+			}
+
 			if (args.length === 0) {
 				if (serverConfig.disabledCommands.size === 0)
 					message.channel.send('There are currently no disabled commands')
 				else
 					message.channel.send(new RichEmbed().setTitle('Disabled Commands')
-						.setDescription([...(serverConfig.disabledCommands.values())].join('\n')))
-
+						.setDescription([...serverConfig.disabledCommands.values()].join('\n')))
 				return resolve()
 			}
-			if (args.length < 2)
-				return reject('Missing required arguments')
-			if (args[0] !== 'enable' && args[0] !== 'disable')
-				return reject(`Invalid argument '${args[0]}'`)
 
 			const embed = new RichEmbed()
 				.setAuthor(message.author.tag, message.author.avatarURL)
 				.setTitle(`${args[0] === 'enable' ? 'Enabled' : 'Disabled'} Commands`)
-				.setFooter(client.user.tag, client.user.avatarURL)
+				.setFooter(client.user.username, client.user.avatarURL)
 				.setTimestamp(new Date())
 
 			let cmds = args.slice(1).map(cmd => cmd.toLowerCase())

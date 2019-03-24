@@ -20,11 +20,12 @@ export default async (message: Message, newmessage: Message, client: DubiousBot)
 		const embed = new RichEmbed()
 			.setAuthor(message.author.tag, message.author.avatarURL)
 			.setTitle('Message was updated')
-			.setDescription(`\u25baPreviously : \`${message.content}\`\n`
-			              + `\u25baNow : \`${newmessage.content}\``)
-			.setFooter(client.user.tag, client.user.avatarURL)
+			.setFooter(client.user.username, client.user.avatarURL)
 			.setTimestamp(new Date())
 			.setColor('DARK_GOLD')
+			.setDescription(
+				`\u25baPreviously : \`${message.content}\`\n` +
+				`\u25baNow : \`${newmessage.content}\``)
 
 		return log.send(`Message was updated in <#${message.channel.id}>`, embed)
 	})
