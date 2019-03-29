@@ -19,8 +19,8 @@ export default async (message: Message, client: DubiousBot) => {
 			.setTimestamp(new Date())
 			.setColor('DARK_PURPLE')
 			.setDescription(
-				`\u25baMessage : \`${Util.escapeMarkdown(message.content, false, true)} \`\n
-				 \u25baChannel : <#${message.channel.id}>\n` +
+				`\u25baMessage : \`${Util.escapeMarkdown(message.content, false, true)} \`\n` +
+				`\u25baChannel : <#${message.channel.id}>\n` +
 				`\u25baID : ${message.id}\n` +
 				`\u25baSent : ${message.createdAt.toUTCString()}`)
 

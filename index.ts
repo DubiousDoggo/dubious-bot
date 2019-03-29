@@ -78,7 +78,7 @@ export class DubiousBot extends Discord.Client {
 		this.on('guildCreate', guild => null)
 		this.on('guildDelete', guild => null)
 		*/
-		
+
 		this.on('guildBanAdd', (guild, user) => guildBanAddHandler(guild, user, this).catch(logger.error))
 		this.on('guildBanRemove', (guild, user) => guildBanRemoveHandler(guild, user, this).catch(logger.error))
 
@@ -123,10 +123,8 @@ export class DubiousBot extends Discord.Client {
 	}
 
 	public fetchConfig(guild: Guild): ConfigFile {
-		logger.debug(`fetching config ${guild.id}`)
 		if (!this.configs.has(guild.id))
 			return this.loadConfig(guild)
-
 		return this.configs.get(guild.id)!
 	}
 
