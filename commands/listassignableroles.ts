@@ -9,15 +9,14 @@ export default {
 	execute: async (message, args, serverConfig) => {
 		return new Promise<void>((resolve, reject) => {
 			if (args.length > 0)
-				return reject('Too many arguments')
+				return reject(`Invalid argument '${args[0]}'`)
 
-			if (serverConfig.assignableRoles.size > 0) {
-				let reply = 'The current assignable roles are'
-					+ (serverConfig.assignableRoles.map((_role, id) => `\n<@&${id}>`).join())
-				message.channel.send(reply)
-			} else {
-				message.channel.send('There are no assignable roles currently set')
-			}
+			if (serverConfig.assignableRoles.size > 0)
+				message.channel.send('The current assignable roles are\n' +
+					serverConfig.assignableRoles.map(role => role.name).join('\n'))
+			else
+				message.channel.send('There are no assignable roles currently available')
+
 			return resolve()
 		})
 	}

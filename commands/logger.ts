@@ -5,18 +5,25 @@ export default {
 	alias: ['log'],
 	level: 'dev',
 	desc: 'Enables or disables the logger.',
-	usage: '[enable/disable]',
+	usage: '[<enable|disable>]',
 	execute: async (message, args, config, client) => {
 		return new Promise<void>((resolve, reject) => {
-			if(args.length <= 0) {
+			if (args.length > 0) {
+				if (args[0] !== 'enable' && args[0] !== 'disable')
+					return reject(`Invalid argument ${args[0]}`)
+				if (args.length > 1)
+					return reject(`Invalid argument ${args[1]}`)
+			}
+
+			if (args.length === 0) {
 				message.channel.send(`The logger is currently ${config.enableLogger ? 'enabled' : 'disabled'}.`)
 				return resolve()
 			}
-			if(args[0] !== 'enable' && args[0] !== 'disable')
-				return reject()
-			
-			if(args[0] === 'enable' && !message.guild.channels.has(config.loggerChannelID) )
-				return reject('No channel set for logging')
+
+			if (args[0] === 'enable' && !message.guild.channels.has(config.loggerChannelID)) {
+				message.channel.send(`No channel set for logging\nPlease set a channel with \`${config.commandPrefix}setlog\``)
+				return resolve()
+			}
 
 			config.enableLogger = (args[0] === 'enable')
 			client.saveConfig(message.guild.id)

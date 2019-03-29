@@ -9,7 +9,7 @@ export default {
 	execute: async (message, args, serverConfig, client) => {
 		return new Promise<void>((resolve, reject) => {
 			if (args.length > 0) 
-				return reject('Too many arguments')
+				return reject(`Invalid argument '${args[0]}'`)
 
 			serverConfig.assignableRoles.deleteAll()
 			message.channel.send('Cleared assignable roles')

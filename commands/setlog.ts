@@ -8,9 +8,9 @@ export default {
 	usage: '',
 	execute: async (message, args, config, client) => {
 		return new Promise<void>((resolve, reject) => {
-			if(args.length > 0)
-				return reject('Too many arguments')
-			
+			if (args.length > 0)
+				return reject(`Invalid Argument ${args[0]}`)
+
 			config.loggerChannelID = message.channel.id
 			client.saveConfig(message.guild.id)
 

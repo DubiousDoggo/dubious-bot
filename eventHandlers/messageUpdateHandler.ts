@@ -6,9 +6,8 @@ export default async (message: Message, newmessage: Message, client: DubiousBot)
 		if (newmessage.author === client.user)
 			return resolve()
 
-		let config = client.configs.get(message.guild.id)
-		if (config === undefined)
-			return reject(`No config file exist for server ${message.guild.id}`)
+		let config = client.fetchConfig(message.guild)
+
 		if (!config.enableLogger)
 			return resolve()
 
@@ -20,11 +19,13 @@ export default async (message: Message, newmessage: Message, client: DubiousBot)
 		const embed = new RichEmbed()
 			.setAuthor(message.author.tag, message.author.avatarURL)
 			.setTitle('Message was updated')
-			.setDescription(`\u25baPreviously : \`${message.content}\`\n`
-			              + `\u25baNow : \`${newmessage.content}\``)
-			.setFooter(client.user.tag, client.user.avatarURL)
+			.setFooter(client.user.username, client.user.avatarURL)
 			.setTimestamp(new Date())
 			.setColor('DARK_GOLD')
+			.setDescription(
+				`\u25baPreviously : \`${message.content}\`\n` +
+				`\u25baNow : \`${newmessage.content}\`\n` +
+				`\u25baID : ${newmessage.id}`)
 
 		return log.send(`Message was updated in <#${message.channel.id}>`, embed)
 	})

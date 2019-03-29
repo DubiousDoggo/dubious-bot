@@ -8,7 +8,7 @@ export default {
 	usage: 'expression',
 	execute: async (message, args, _serverConfig, client) => {
 		return new Promise<void>((resolve, reject) => {
-			if(message.author.id === client.auth.developerID) {
+			if (message.author.id === client.auth.developerID) {
 				let expression = args.join(' ')
 				logger.warn(`Unsafe Eval: ${expression}`)
 				message.channel.send(`${eval(expression)}`)
