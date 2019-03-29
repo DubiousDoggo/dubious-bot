@@ -9,7 +9,7 @@ export default {
 	usage: '[<enable|disable> <...command-name>]',
 	execute: async (message, args, serverConfig, client) => {
 		return new Promise<void>((resolve, reject) => {
-			if(args.length > 0) {
+			if (args.length > 0) {
 				if (args[0] !== 'enable' && args[0] !== 'disable')
 					return reject(`Invalid argument '${args[0]}'`)
 				if (args.length < 2)
@@ -47,7 +47,7 @@ export default {
 					return `${cmd} already enabled`
 				} else {
 					if (cmd === 'command')
-						return `Are you trying to break me??`
+						return 'Are you trying to break me??'
 
 					if (!serverConfig.disabledCommands.has(cmd)) {
 						serverConfig.disabledCommands.add(cmd)

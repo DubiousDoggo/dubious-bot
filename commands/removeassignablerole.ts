@@ -7,21 +7,18 @@ export default {
 	desc: 'Removes a role from being self-assignable.',
 	usage: '<...@role>',
 	execute: async (message, _args, serverConfig, client) => {
-		if (message.mentions.roles.size <= 0)
-			return Promise.reject('No roles specified')
+		return new Promise<void>((resolve, reject) => {
+			if (message.mentions.roles.size < 1)
+				return reject('No roles mentioned')
 
-		let reply = ''
-		message.mentions.roles.forEach(((role, id) => {
-			if(serverConfig.assignableRoles.delete(id)) {
-				reply += `Removed <@&${id}> from assignable roles`
-				logger.verbose(`Removed @${role.name} as assignable role in server '${role.guild.name}'`)
-				logger.debug(`id:${id} id:${role.guild.id}`)
-			} else {
-				reply += `<@&${id}> is not an assignable role`
-			}
-		}))
-		message.channel.send(reply.trimRight())
-		client.saveConfig(message.guild.id)
-		return Promise.resolve()
+			message.channel.send(message.mentions.roles.map((role, id) =>
+				serverConfig.assignableRoles.delete(id)
+					? `Removed ${role.name} from assignable roles`
+					: `${role.name} is not an assignable role`
+			).join('\n'))
+
+			client.saveConfig(message.guild.id)
+			return resolve()
+		})
 	}
 } as Command

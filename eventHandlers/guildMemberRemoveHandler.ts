@@ -3,13 +3,11 @@ import { DubiousBot } from "..";
 
 export default async (member: GuildMember, client: DubiousBot) => {
 	return new Promise<void>((resolve, reject) => {
-		let config = client.configs.get(member.guild.id)
-		if (config === undefined)
-			return reject(`No config file exist for server ${member.guild.id}`)
+		const config = client.fetchConfig(member.guild)
 		if (!config.enableLogger)
 			return resolve()
 
-		let log = member.guild.channels.get(config.loggerChannelID)
+		const log = member.guild.channels.get(config.loggerChannelID)
 
 		if (!(log instanceof TextChannel))
 			return reject(`logger channel does not exist for guild ${member.guild.id}`)

@@ -11,7 +11,7 @@ export default {
 			return Promise.reject('No roles specified')
 
 		message.mentions.roles.forEach(((role, id) => {
-			if(serverConfig.adminRoles.delete(id)) {
+			if (serverConfig.adminRoles.delete(id)) {
 				message.channel.send(`Removed <@&${id}> from admin roles`)
 				logger.verbose(`Removed @${role.name} as admin role in server '${role.guild.name}'`)
 				logger.debug(`id:${id} id:${role.guild.id}`)

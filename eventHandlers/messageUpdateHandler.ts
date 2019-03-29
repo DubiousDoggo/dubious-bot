@@ -6,9 +6,8 @@ export default async (message: Message, newmessage: Message, client: DubiousBot)
 		if (newmessage.author === client.user)
 			return resolve()
 
-		let config = client.configs.get(message.guild.id)
-		if (config === undefined)
-			return reject(`No config file exist for server ${message.guild.id}`)
+		let config = client.fetchConfig(message.guild)
+
 		if (!config.enableLogger)
 			return resolve()
 
@@ -25,7 +24,8 @@ export default async (message: Message, newmessage: Message, client: DubiousBot)
 			.setColor('DARK_GOLD')
 			.setDescription(
 				`\u25baPreviously : \`${message.content}\`\n` +
-				`\u25baNow : \`${newmessage.content}\``)
+				`\u25baNow : \`${newmessage.content}\`\n` +
+				`\u25baID : ${newmessage.id}`)
 
 		return log.send(`Message was updated in <#${message.channel.id}>`, embed)
 	})

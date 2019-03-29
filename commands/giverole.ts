@@ -10,10 +10,14 @@ export default {
 	execute: async (message, _args, serverConfig) => {
 		return new Promise<void>((resolve, reject) => {
 			if (message.mentions.roles.size < 1)
-				return reject('Missing required arguments')
+				return reject('No roles mentioned')
 
 			const newUser = message.member.roles.size === 0
-			const [assign, unassigned] = message.mentions.roles.partition((_role, id) => serverConfig.assignableRoles.has(id))
+			//waiting on type patch
+			//const [assign, unassigned] = message.mentions.roles.partition((_role, id) => serverConfig.assignableRoles.has(id))
+			const assign = message.mentions.roles.filter((_role, id) => serverConfig.assignableRoles.has(id))
+			const unassigned = message.mentions.roles.filter((_role, id) => !serverConfig.assignableRoles.has(id))
+
 			message.member.addRoles(assign, 'user requested')
 
 			if (unassigned.size === 0) {

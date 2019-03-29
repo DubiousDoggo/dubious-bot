@@ -5,6 +5,3 @@
 !package-lock.json
 node_modules
 auth.json
-
-#This one is outdated for some reason
-!node_modules/discord.js/typings/index.d.ts
