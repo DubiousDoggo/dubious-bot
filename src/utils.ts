@@ -1,5 +1,5 @@
-import { permissionLevel, ConfigFile, DubiousBot } from "..";
 import { GuildMember } from "discord.js";
+import { DubiousBot, PermissionLevel, PermissionLevelResolvable } from "..";
 
 export const humanList = (list: string[], singular = '', plural = '', conjunc = 'and', singularprefix = '', pluralprefix = ''): string => {
 	if (list.length === 0)
@@ -11,7 +11,7 @@ export const humanList = (list: string[], singular = '', plural = '', conjunc = 
 }
 
 export const weightedRandom = (...weights: number[]): number => {
-	let total = weights.reduce((t, i) => t + i)
+	const total = weights.reduce((t, i) => t + i)
 	let r = Math.floor(Math.random() * total)
 	for (let i = 0; i < weights.length; i++) {
 		if (r < weights[i])
@@ -21,21 +21,11 @@ export const weightedRandom = (...weights: number[]): number => {
 	throw new Error('weighted random failure')
 }
 
-export const getLevel = (member: GuildMember, client: DubiousBot): permissionLevel => {
-	if (member.id === client.auth.developerID)
-		return 'dev'
-
-	if (client.fetchConfig(member.guild).adminRoles.keyArray().some(id => member.roles.has(id)))
-		return 'admin'
-
-	return 'user'
-}
-
-export const levelcmp = (lhs: GuildMember | permissionLevel, rhs: GuildMember | permissionLevel, client: DubiousBot): number => {
+export const levelcmp = (lhs: PermissionLevelResolvable, rhs: PermissionLevelResolvable, client: DubiousBot): number => {
 	return getComputedLevel(lhs, client) - getComputedLevel(rhs, client);
 }
 
-const getComputedLevel = (level: permissionLevel | GuildMember, client: DubiousBot): number => {
+const getComputedLevel = (level: PermissionLevelResolvable, client: DubiousBot): number => {
 	if (level instanceof GuildMember)
 		level = getLevel(level, client)
 
@@ -44,4 +34,14 @@ const getComputedLevel = (level: permissionLevel | GuildMember, client: DubiousB
 		case 'admin': return 2
 		case 'dev': return 3
 	}
+}
+
+const getLevel = (member: GuildMember, client: DubiousBot): PermissionLevel => {
+	if (member.id === client.auth.developerID)
+		return 'dev'
+
+	if (client.fetchConfig(member.guild).adminRoles.keyArray().some(member.roles.has))
+		return 'admin'
+
+	return 'user'
 }

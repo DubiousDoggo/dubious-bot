@@ -20,7 +20,7 @@ export default {
 				return resolve()
 			}
 
-			if (args[0] === 'enable' && !message.guild.channels.has(config.loggerChannelID)) {
+			if (args[0] === 'enable' && !config.loggerChannels.has('default')) {
 				message.channel.send(`No channel set for logging\nPlease set a channel with \`${config.commandPrefix}setlog\``)
 				return resolve()
 			}

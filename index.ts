@@ -1,11 +1,10 @@
 /*
  * TODO LIST
- * Add message logger
  * Fix documentation
- * Set up dependencies
  * Make output fancy
+ * Figure out modules
  */
-import Discord, { Collection, Guild, Message, Role, Snowflake } from 'discord.js';
+import Discord, { Collection, Guild, GuildResolvable, Message, Role, Snowflake, TextChannel, GuildMember } from 'discord.js';
 import fs from 'fs';
 import winston from 'winston';
 import guildBanAddHandler from './eventHandlers/guildBanAddHandler';
@@ -19,21 +18,23 @@ import roleCreateHandler from './eventHandlers/roleCreateHandler';
 import roleDeleteHandler from './eventHandlers/roleDeleteHandler';
 import roleUpdateHandler from './eventHandlers/roleUpdateHandler';
 
-export type permissionLevel = 'user' | 'admin' | 'dev'
+export type PermissionLevel = 'user' | 'admin' | 'dev'
+export type PermissionLevelResolvable = PermissionLevel | GuildMember
+export type LogChannelType = 'mod' | 'join' | 'message' | 'default'
 
 export interface Command {
 	name: string
 	alias: string[]
-	level: permissionLevel
+	level: PermissionLevel
 	desc: string
 	usage: string
-	execute: (message: Message, args: string[], config: ConfigFile, client: DubiousBot) => Promise<any>
+	execute: (message: Message, args: string[], config: ConfigFile, client: DubiousBot) => Promise<void>
 }
 
 export interface ConfigFile {
 	commandPrefix: string
 	enableLogger: boolean
-	loggerChannelID: Snowflake
+	loggerChannels: Collection<LogChannelType, TextChannel>
 	assignableRoles: Collection<Snowflake, Role>
 	adminRoles: Collection<Snowflake, Role>
 	disabledCommands: Set<string>
@@ -105,6 +106,38 @@ export class DubiousBot extends Discord.Client {
 		this.on('debug', info => (/heartbeat/ig.test(info) ? logger.silly : logger.debug)(info))
 	}
 
+	public async fetchLogChannel(guild: Guild, type?: LogChannelType): Promise<TextChannel> {
+		return new Promise<TextChannel>((resolve, reject) => {
+			if (type === undefined)
+				type = 'default'
+			const config = this.fetchConfig(guild)
+			const channel = config.loggerChannels.get(type)
+			if (channel === undefined) {
+				if(type === 'default')
+					return reject(type)
+				return this.fetchLogChannel(guild).catch(_type => reject(type))
+			}
+			return resolve(channel)
+		})
+	}
+
+	public async fetchCommand(cmd?: string): Promise<Command> {
+		return new Promise<Command>((resolve, reject) => {
+			if (cmd === undefined)
+				return reject(cmd)
+			const command = this.commands.get(cmd)
+			if (command === undefined)
+				return reject(cmd)
+			return resolve(command)
+		})
+	}
+
+	public fetchConfig(guild: Guild): ConfigFile {
+		if (!this.configs.has(guild.id))
+			return this.loadConfig(guild)
+		return this.configs.get(guild.id)!
+	}
+
 	public initCommands() {
 		logger.info('Loading Commands')
 		fs.readdirSync('./commands', fileEncoding)
@@ -122,12 +155,6 @@ export class DubiousBot extends Discord.Client {
 			})
 	}
 
-	public fetchConfig(guild: Guild): ConfigFile {
-		if (!this.configs.has(guild.id))
-			return this.loadConfig(guild)
-		return this.configs.get(guild.id)!
-	}
-
 	private loadConfig(guild: Guild): ConfigFile {
 		let data: string
 		try {
@@ -138,8 +165,15 @@ export class DubiousBot extends Discord.Client {
 			else
 				throw err
 		}
-		let configData = JSON.parse(data)
-		let config = configData as ConfigFile
+		const configData = JSON.parse(data)
+		const config = configData as ConfigFile
+
+		if (configData.loggerChannels instanceof Array)
+			config.loggerChannels = new Collection<LogChannelType, TextChannel>(
+				(configData.loggerChannels as Array<[string, string]>)
+					.map<[LogChannelType, TextChannel]>(value => [value[0] as LogChannelType, guild.channels.get(value[1]) as TextChannel]))
+		else
+			config.loggerChannels = new Collection<LogChannelType, TextChannel>()
 
 		if (configData.adminRoles instanceof Array)
 			config.adminRoles = new Collection<Snowflake, Role>(
@@ -163,18 +197,21 @@ export class DubiousBot extends Discord.Client {
 			config.disabledCommands = new Set()
 
 		this.configs.set(guild.id, config)
+		logger.debug(`loaded config for guild id ${guild.id}`)
 
 		this.saveConfig(guild.id)
-		logger.debug(`loaded config for guild id ${guild.id}`)
 		return config
 	}
 
-	public saveConfig(id: Snowflake) {
+	public saveConfig(guild: GuildResolvable) {
+		const id = guild instanceof Guild ? guild.id : guild
 		logger.debug(`saving config for guild id ${id}`)
-		let data = JSON.stringify(this.configs.get(id), (_key, value) =>
-			value instanceof Collection ? value.keyArray() :
-				value instanceof Set ? [...value] :
-					value, 2)
+		let data = JSON.stringify(this.configs.get(id), (key, value) =>
+			key === 'LoggerChannels' ?
+				value instanceof Collection ? value.map<[string, string]>((key, value) => [key, value.id]) : undefined
+				: value instanceof Collection ? value.keyArray()
+					: value instanceof Set ? [...value]
+						: value, 2)
 		fs.writeFileSync(`./configs/${id}.json`, data)
 	}
 }
