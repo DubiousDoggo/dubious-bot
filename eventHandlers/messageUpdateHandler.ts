@@ -1,5 +1,6 @@
 import { Message, RichEmbed } from "discord.js";
 import { DubiousBot, logger } from "..";
+import { escapeTicks } from "../src/utils";
 
 export default async (message: Message, newmessage: Message, client: DubiousBot) => {
 	return new Promise<void>((resolve, reject) => {
@@ -19,8 +20,8 @@ export default async (message: Message, newmessage: Message, client: DubiousBot)
 					.setTimestamp(new Date())
 					.setColor('DARK_GOLD')
 					.setDescription(
-						`\u25baPreviously : \`${message.content}\`\n` +
-						`\u25baNow : \`${newmessage.content}\`\n` +
+						`\u25baPreviously : ${escapeTicks(message.content)}\n` +
+						`\u25baNow : \`${escapeTicks(newmessage.content)}\`\n` +
 						`\u25baID : ${newmessage.id}`)
 
 				return log.send(`Message was updated in <#${message.channel.id}>`, embed)

@@ -1,5 +1,6 @@
-import { Attachment, Message, RichEmbed, Util } from "discord.js";
+import { Attachment, Message, RichEmbed } from "discord.js";
 import { DubiousBot, logger } from "..";
+import { escapeTicks } from "../src/utils";
 
 export default async (message: Message, client: DubiousBot) => {
 	return new Promise<void>((resolve, reject) => {
@@ -16,7 +17,7 @@ export default async (message: Message, client: DubiousBot) => {
 					.setTimestamp(new Date())
 					.setColor('DARK_PURPLE')
 					.setDescription(
-						`\u25baMessage : \`${Util.escapeMarkdown(message.content, false, true)} \`\n` +
+						`\u25baMessage : ${escapeTicks(message.content)}\n` +
 						`\u25baChannel : <#${message.channel.id}>\n` +
 						`\u25baID : ${message.id}\n` +
 						`\u25baSent : ${message.createdAt.toUTCString()}`)

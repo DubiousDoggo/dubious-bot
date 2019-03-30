@@ -1,6 +1,6 @@
-import { Message, TextChannel, Util } from "discord.js";
+import { Message, TextChannel } from "discord.js";
 import { DubiousBot } from "..";
-import { levelcmp } from "../src/utils";
+import { escapeTicks, levelcmp } from "../src/utils";
 
 export default async (message: Message, client: DubiousBot) => {
 	return new Promise<void>((resolve, _reject) => {
@@ -26,7 +26,7 @@ export default async (message: Message, client: DubiousBot) => {
 				return command.execute(message, args, config, client)
 					.catch(reason => message.channel.send(`${reason}\nUsage: ${command.name} ${command.usage}`))
 
-			}).catch(cmd => message.channel.send(`Unknown command \`${Util.escapeMarkdown(cmd, false, true)}'\n` +
+			}).catch(cmd => message.channel.send(`Unknown command ${escapeTicks(cmd)}\n` +
 				`Type \`${config.commandPrefix}help\` for a list of commands`))
 
 		} else if (message.isMentioned(client.user)) {

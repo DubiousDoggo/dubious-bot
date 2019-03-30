@@ -3,7 +3,7 @@
   "description": "A discord bot custom made for Duff's",
   "repository": "https://github.com/DubiousDoggo/dubious-bot",
   "license": "WTFPL",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "main": "index.js",
   "author": "Dubious Doggo",
   "dependencies": {

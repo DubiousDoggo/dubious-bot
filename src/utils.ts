@@ -1,6 +1,8 @@
 import { GuildMember } from "discord.js";
 import { DubiousBot, PermissionLevel, PermissionLevelResolvable } from "..";
 
+export const escapeTicks = (str: string) => `\`\u200b${str.replace(/(?<!`)`(?!`)/g,'``')}\u200b\``
+
 export const humanList = (list: string[], singular = '', plural = '', conjunc = 'and', singularprefix = '', pluralprefix = ''): string => {
 	if (list.length === 0)
 		return 'NONE'
