@@ -7,6 +7,6 @@ export default {
 	desc: 'Play a friendly game of Ping Pong',
 	usage: '',
 	execute: async (message, _args, _config, client) => {
-		return message.channel.send(`Pong! ${client.ping}ms`)
+		return new Promise<void>(_resolve => message.channel.send(`Pong! ${client.ping}ms`))
 	}
 } as Command

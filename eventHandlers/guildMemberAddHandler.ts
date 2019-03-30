@@ -1,5 +1,5 @@
 import { GuildMember, RichEmbed, TextChannel } from "discord.js";
-import { DubiousBot } from "..";
+import { DubiousBot, logger } from "..";
 
 export default async (member: GuildMember, client: DubiousBot) => {
 	return new Promise<void>((resolve, reject) => {
@@ -7,21 +7,19 @@ export default async (member: GuildMember, client: DubiousBot) => {
 		if (!config.enableLogger)
 			return resolve()
 
-		const log = member.guild.channels.get(config.loggerChannelID)
+		client.fetchLogChannel(member.guild, 'join')
+			.then(log => {
+				const embed = new RichEmbed()
+					.setAuthor(member.user.tag, member.user.avatarURL)
+					.setTitle('User has joined')
+					.setFooter(client.user.username, client.user.avatarURL)
+					.setTimestamp(new Date())
+					.setColor('AQUA')
+					.setDescription(
+						`\u25baName: ${member.user.tag}\n` +
+						`\u25baJoined: ${member.joinedAt.toUTCString()}`)
 
-		if (!(log instanceof TextChannel))
-			return reject(`logger channel does not exist for guild ${member.guild.id}`)
-
-		const embed = new RichEmbed()
-			.setAuthor(member.user.tag, member.user.avatarURL)
-			.setTitle('User has joined')
-			.setFooter(client.user.username, client.user.avatarURL)
-			.setTimestamp(new Date())
-			.setColor('AQUA')
-			.setDescription(
-				`\u25baName: ${member.user.tag}\n` +
-				`\u25baJoined: ${member.joinedAt.toUTCString()}`)
-
-		return log.send(`${member.user.tag} has joined`, embed)
+				return log.send(`${member.user.tag} has joined`, embed)
+			}, type => logger.error(`${type} log channel is not set for ${member.guild.id}!`))
 	})
 }
