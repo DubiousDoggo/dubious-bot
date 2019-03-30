@@ -125,6 +125,8 @@ export class DubiousBot extends Discord.Client {
 		return new Promise<Command>((resolve, reject) => {
 			if (cmd === undefined)
 				return reject(cmd)
+			if(this.aliasMap.has(cmd))
+				cmd = this.aliasMap.get(cmd)!
 			const command = this.commands.get(cmd)
 			if (command === undefined)
 				return reject(cmd)
