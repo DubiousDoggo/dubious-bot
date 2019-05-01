@@ -113,7 +113,7 @@ export class DubiousBot extends Discord.Client {
 			const config = this.fetchConfig(guild)
 			const channel = config.loggerChannels.get(type)
 			if (channel === undefined) {
-				if(type === 'default')
+				if (type === 'default')
 					return reject(type)
 				return this.fetchLogChannel(guild).catch(_type => reject(type))
 			}
@@ -125,7 +125,7 @@ export class DubiousBot extends Discord.Client {
 		return new Promise<Command>((resolve, reject) => {
 			if (cmd === undefined)
 				return reject(cmd)
-			if(this.aliasMap.has(cmd))
+			if (this.aliasMap.has(cmd))
 				cmd = this.aliasMap.get(cmd)!
 			const command = this.commands.get(cmd)
 			if (command === undefined)
@@ -208,12 +208,18 @@ export class DubiousBot extends Discord.Client {
 	public saveConfig(guild: GuildResolvable) {
 		const id = guild instanceof Guild ? guild.id : guild
 		logger.debug(`saving config for guild id ${id}`)
-		let data = JSON.stringify(this.configs.get(id), (key, value) =>
-			key === 'LoggerChannels' ?
-				value instanceof Collection ? value.map<[string, string]>((key, value) => [key, value.id]) : undefined
-				: value instanceof Collection ? value.keyArray()
-					: value instanceof Set ? [...value]
-						: value, 2)
+		let data = JSON.stringify(this.configs.get(id),
+			(key, value) =>
+				key === 'loggerChannels' ?
+					value instanceof Collection ?
+						value.map<[string, string]>((key, value) => [key, value.id])
+						: undefined
+					: value instanceof Collection ?
+						value.keyArray()
+						: value instanceof Set ?
+							[...value]
+							: value,
+			2)
 		fs.writeFileSync(`./configs/${id}.json`, data)
 	}
 }
