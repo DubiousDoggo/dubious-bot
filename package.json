@@ -3,12 +3,12 @@
   "description": "A discord bot custom made for Duff's",
   "repository": "https://github.com/DubiousDoggo/dubious-bot",
   "license": "WTFPL",
-  "version": "3.0.2",
+  "version": "4.0.0",
   "main": "index.js",
   "author": "Dubious Doggo",
   "dependencies": {
     "bufferutil": "^4.0.0",
-    "discord.js": "github:discordjs/discord.js#11.4-dev",
+    "discord.js": "github:discordjs/discord.js#11.5-dev",
     "lodash": "^4.17.11",
     "typescript": "^3.3.3333",
     "winston": "^3.0.0"
