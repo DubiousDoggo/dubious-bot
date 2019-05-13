@@ -1,7 +1,7 @@
 import { GuildMember } from "discord.js";
 import { DubiousBot, PermissionLevel, PermissionLevelResolvable } from "..";
 
-export const escapeTicks = (str: string) => `\`\u200b${str.replace(/(?<!`)`(?!`)/g,'``')}\u200b\``
+export const escapeTicks = (str: string) => `\`\u200b${str.replace(/(?<!`)`(?!`)/g, '``')}\u200b\``
 
 export const humanList = (list: string[], singular = '', plural = '', conjunc = 'and', singularprefix = '', pluralprefix = ''): string => {
 	if (list.length === 0)
@@ -15,17 +15,14 @@ export const humanList = (list: string[], singular = '', plural = '', conjunc = 
 export const weightedRandom = (...weights: number[]): number => {
 	const total = weights.reduce((t, i) => t + i)
 	let r = Math.floor(Math.random() * total)
-	for (let i = 0; i < weights.length; i++) {
+	for (let i = 0; i < weights.length; r -= weights[i++])
 		if (r < weights[i])
 			return i
-		r -= weights[i]
-	}
 	throw new Error('weighted random failure')
 }
 
-export const levelcmp = (lhs: PermissionLevelResolvable, rhs: PermissionLevelResolvable, client: DubiousBot): number => {
-	return getComputedLevel(lhs, client) - getComputedLevel(rhs, client);
-}
+export const levelcmp = (lhs: PermissionLevelResolvable, rhs: PermissionLevelResolvable, client: DubiousBot): number =>
+	getComputedLevel(lhs, client) - getComputedLevel(rhs, client)
 
 const getComputedLevel = (level: PermissionLevelResolvable, client: DubiousBot): number => {
 	if (level instanceof GuildMember)

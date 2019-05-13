@@ -2,7 +2,7 @@
  * TODO LIST
  * Fix documentation
  * Make output fancy
- * Figure out modules
+ * Figure out modules & definitions
  */
 import Discord, { Collection, Guild, GuildResolvable, Message, Role, Snowflake, TextChannel, GuildMember } from 'discord.js';
 import fs from 'fs';
@@ -67,11 +67,7 @@ export class DubiousBot extends Discord.Client {
 		super()
 		this.initCommands()
 
-		this.on('ready', () => {
-			logger.info('Connected')
-				.info(`Logged in as: ${this.user.tag}`)
-				.debug(`id: ${this.user.id}`)
-		})
+		this.on('ready', () => logger.info('Connected').info(`Logged in as: ${this.user.tag}`).debug(`id: ${this.user.id}`))
 		this.on('reconnecting', () => logger.warn('Connection interruped, reconnecting...'))
 		this.on('disconnect', event => (event.wasClean ? logger.info : logger.warn)(`Disconnected ${event.reason}`).debug(`code: ${event.code}`))
 
@@ -135,9 +131,7 @@ export class DubiousBot extends Discord.Client {
 	}
 
 	public fetchConfig(guild: Guild): ConfigFile {
-		if (!this.configs.has(guild.id))
-			return this.loadConfig(guild)
-		return this.configs.get(guild.id)!
+		return this.configs.has(guild.id) ? this.configs.get(guild.id)! : this.loadConfig(guild)
 	}
 
 	public initCommands() {
@@ -151,52 +145,31 @@ export class DubiousBot extends Discord.Client {
 				this.commands.set(command.name, command)
 				command.alias.forEach(alias => {
 					if (this.aliasMap.has(alias))
-						throw Error(`alias collision ${alias} for commands ${command.name} and ${(this.commands.get(this.aliasMap.get(alias) as string) as Command).name}`)
+						throw Error(`alias collision ${alias} for commands ${command.name} and `
+							+ (this.commands.get(this.aliasMap.get(alias) as string) as Command).name)
 					this.aliasMap.set(alias, command.name)
 				})
 			})
 	}
 
 	private loadConfig(guild: Guild): ConfigFile {
-		let data: string
-		try {
-			data = fs.readFileSync(`./configs/${guild.id}.json`, fileEncoding)
-		} catch (err) {
-			if (err.code == 'ENOENT')
-				data = fs.readFileSync('./configs/default.json', fileEncoding)
-			else
-				throw err
-		}
+		const data = fs.readFileSync(fs.existsSync(`./configs/${guild.id}.json`) ? `./configs/${guild.id}.json` : './configs/default.json', fileEncoding)
 		const configData = JSON.parse(data)
 		const config = configData as ConfigFile
 
-		if (configData.loggerChannels instanceof Array)
-			config.loggerChannels = new Collection<LogChannelType, TextChannel>(
-				(configData.loggerChannels as Array<[string, string]>)
-					.map<[LogChannelType, TextChannel]>(value => [value[0] as LogChannelType, guild.channels.get(value[1]) as TextChannel]))
-		else
-			config.loggerChannels = new Collection<LogChannelType, TextChannel>()
+		config.loggerChannels = new Collection<LogChannelType, TextChannel>(configData.loggerChannels instanceof Array ?
+			(configData.loggerChannels as Array<[string, string]>).filter(value => guild.channels.has(value[1]))
+				.map<[LogChannelType, TextChannel]>(value => [value[0] as LogChannelType, guild.channels.get(value[1]) as TextChannel]) : undefined)
 
-		if (configData.adminRoles instanceof Array)
-			config.adminRoles = new Collection<Snowflake, Role>(
-				(configData.adminRoles as Array<Snowflake>)
-					.filter(id => guild.roles.has(id))
-					.map<[Snowflake, Role]>(id => [id, guild.roles.get(id) as Role]))
-		else
-			config.adminRoles = new Collection<Snowflake, Role>()
+		config.adminRoles = new Collection<Snowflake, Role>(configData.adminRoles instanceof Array ?
+			(configData.adminRoles as Array<[string, string]>).filter(value => guild.roles.has(value[1]))
+				.map<[Snowflake, Role]>(value => [value[0], guild.roles.get(value[1]) as Role]) : undefined)
 
-		if (configData.assignableRoles instanceof Array)
-			config.assignableRoles = new Collection<Snowflake, Role>(
-				(configData.assignableRoles as Array<Snowflake>)
-					.filter(id => guild.roles.has(id))
-					.map<[Snowflake, Role]>(id => [id, guild.roles.get(id) as Role]))
-		else
-			config.assignableRoles = new Collection<Snowflake, Role>()
+		config.assignableRoles = new Collection<Snowflake, Role>(configData.assignableRoles instanceof Array ?
+			(configData.assignableRoles as Array<[string, string]>).filter(value => guild.roles.has(value[1]))
+				.map<[Snowflake, Role]>(value => [value[0], guild.roles.get(value[1]) as Role]) : undefined)
 
-		if (configData.disabledCommands instanceof Array)
-			config.disabledCommands = new Set(configData.disabledCommands)
-		else
-			config.disabledCommands = new Set()
+		config.disabledCommands = new Set(configData.disabledCommands instanceof Array ? configData.disabledCommands : undefined)
 
 		this.configs.set(guild.id, config)
 		logger.debug(`loaded config for guild id ${guild.id}`)
@@ -208,22 +181,12 @@ export class DubiousBot extends Discord.Client {
 	public saveConfig(guild: GuildResolvable) {
 		const id = guild instanceof Guild ? guild.id : guild
 		logger.debug(`saving config for guild id ${id}`)
-		let data = JSON.stringify(this.configs.get(id),
-			(key, value) =>
-				key === 'loggerChannels' ?
-					value instanceof Collection ?
-						value.map<[string, string]>((key, value) => [key, value.id])
-						: undefined
-					: value instanceof Collection ?
-						value.keyArray()
-						: value instanceof Set ?
-							[...value]
-							: value,
-			2)
+		let data = JSON.stringify(this.configs.get(id), (_key, value) =>
+			value instanceof Collection ? value.map<[string, string]>((v, k) => [k, v.id])
+				: value instanceof Set ? [...value] : value, '\t')
 		fs.writeFileSync(`./configs/${id}.json`, data)
 	}
 }
 
 const bot = new DubiousBot()
-
 bot.login(bot.auth.token)
