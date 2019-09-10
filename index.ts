@@ -102,6 +102,11 @@ export class DubiousBot extends Discord.Client {
 		this.on('debug', info => (/heartbeat/ig.test(info) ? logger.silly : logger.debug)(info))
 	}
 
+	/**
+	 * 
+	 * @param guild
+	 * @param type 
+	 */
 	public async fetchLogChannel(guild: Guild, type?: LogChannelType): Promise<TextChannel> {
 		return new Promise<TextChannel>((resolve, reject) => {
 			if (type === undefined)
@@ -117,6 +122,7 @@ export class DubiousBot extends Discord.Client {
 		})
 	}
 
+	
 	public async fetchCommand(cmd?: string): Promise<Command> {
 		return new Promise<Command>((resolve, reject) => {
 			if (cmd === undefined)
@@ -130,6 +136,11 @@ export class DubiousBot extends Discord.Client {
 		})
 	}
 
+	/**
+	 * Fetches the config file associated with the guild. If the file has not been cached, it is loaded and returned. 
+	 * @param guild 
+	 * @returns The `ConfigFile` object associated with the `guild`
+	 */
 	public fetchConfig(guild: Guild): ConfigFile {
 		return this.configs.has(guild.id) ? this.configs.get(guild.id)! : this.loadConfig(guild)
 	}
@@ -137,7 +148,7 @@ export class DubiousBot extends Discord.Client {
 	public initCommands() {
 		logger.info('Loading Commands')
 		fs.readdirSync('./commands', fileEncoding)
-			.filter(fileName => !fileName.startsWith('_') && fileName.endsWith('.js'))
+			.filter(fileName => fileName.endsWith('.js') && !fileName.startsWith('_'))
 			.forEach(fileName => {
 				const command = require(`./commands/${fileName}`).default as Command
 				if (this.commands.has(command.name))
