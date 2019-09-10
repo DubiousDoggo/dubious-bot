@@ -1,5 +1,6 @@
 import { RichEmbed } from "discord.js";
-import { Command } from "..";
+import fs from 'fs';
+import { Command, fileEncoding } from "..";
 
 export default {
 
@@ -20,7 +21,8 @@ export default {
 				.setColor('BLUE')
 				.addField('Servers Joined', client.guilds.size, true)
 				.addField('Ping', `${client.ping}ms`, true)
-				.addField('Launched', new Date(Date.now() - client.uptime).toUTCString(), true)
+				.addField('Uptime', new Date(Date.now() - client.uptime).toUTCString(), true)
+				.addField('Version', JSON.parse(fs.readFileSync('../package.json', fileEncoding)).version)
 			message.channel.send(embed)
 			return resolve()
 		})
