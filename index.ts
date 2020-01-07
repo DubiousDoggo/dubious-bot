@@ -1,24 +1,18 @@
-/*
- * TODO LIST
- * Fix documentation
- * Make output fancy
- * Figure out modules & definitions
- */
-import Discord, { Collection, Guild, GuildResolvable, Message, Role, Snowflake, TextChannel, GuildMember } from 'discord.js';
+import Discord, { Collection, Guild, GuildMember, GuildResolvable, Message, Role, Snowflake, TextChannel, ClientDataResolver } from 'discord.js';
 import fs from 'fs';
 import winston from 'winston';
-import guildBanAddHandler from './eventHandlers/guildBanAddHandler';
-import guildBanRemoveHandler from './eventHandlers/guildBanRemoveHandler';
-import guildMemberAddHandler from './eventHandlers/guildMemberAddHandler';
-import guildMemberRemoveHandler from './eventHandlers/guildMemberRemoveHandler';
-import messageDeleteHandler from './eventHandlers/messageDeleteHandler';
-import messageHandler from './eventHandlers/messageHandler';
-import messageUpdateHandler from './eventHandlers/messageUpdateHandler';
-import roleCreateHandler from './eventHandlers/roleCreateHandler';
-import roleDeleteHandler from './eventHandlers/roleDeleteHandler';
-import roleUpdateHandler from './eventHandlers/roleUpdateHandler';
+import { guildBanAddHandler } from './eventHandlers/guildBanAddHandler';
+import { guildBanRemoveHandler } from './eventHandlers/guildBanRemoveHandler';
+import { guildMemberAddHandler } from './eventHandlers/guildMemberAddHandler';
+import { guildMemberRemoveHandler } from './eventHandlers/guildMemberRemoveHandler';
+import { messageDeleteHandler } from './eventHandlers/messageDeleteHandler';
+import { messageHandler } from './eventHandlers/messageHandler';
+import { messageUpdateHandler } from './eventHandlers/messageUpdateHandler';
+import { roleCreateHandler } from './eventHandlers/roleCreateHandler';
+import { roleDeleteHandler } from './eventHandlers/roleDeleteHandler';
+import { roleUpdateHandler } from './eventHandlers/roleUpdateHandler';
 
-export type PermissionLevel = 'user' | 'admin' | 'dev'
+export enum PermissionLevel { user, admin, developer }
 export type PermissionLevelResolvable = PermissionLevel | GuildMember
 export type LogChannelType = 'mod' | 'join' | 'message' | 'default'
 
@@ -54,14 +48,17 @@ export const logger = winston.createLogger({
 })
 
 export const fileEncoding = 'utf8'
+export const commandDir = './commands'
+export const configsDir = './configs'
 
 export class DubiousBot extends Discord.Client {
 	auth = JSON.parse(fs.readFileSync('./auth.json', fileEncoding))
 
-	private configs = new Collection<Snowflake, ConfigFile>()
+	public data_resolver = new ClientDataResolver(this)
+	public aliasMap = new Collection<string, string>()
+	public commands = new Collection<string, Command>()
 
-	aliasMap = new Collection<string, string>()
-	commands = new Collection<string, Command>()
+	private configs = new Collection<Snowflake, ConfigFile>()
 
 	constructor() {
 		super()
@@ -97,75 +94,40 @@ export class DubiousBot extends Discord.Client {
 		this.on('messageDeleteBulk', messages => messages.forEach(message => messageDeleteHandler(message, this).catch(logger.error)))
 		this.on('messageUpdate', (oldmessage, newmessage) => messageUpdateHandler(oldmessage, newmessage, this).catch(logger.error))
 
-		this.on('error', error => logger.error(error))
+		this.on('error', info => logger.error(info))
 		this.on('warn', info => logger.warn(info))
-		this.on('debug', info => (/heartbeat/ig.test(info) ? logger.silly : logger.debug)(info))
+		this.on('debug', info => (info.includes('heartbeat') ? logger.silly : logger.debug)(info))
 	}
 
 	/**
-	 * 
-	 * @param guild
-	 * @param type 
+	 * Fetches the TextChannel in the guild for logging the given type of data 
 	 */
-	public async fetchLogChannel(guild: Guild, type?: LogChannelType): Promise<TextChannel> {
-		return new Promise<TextChannel>((resolve, reject) => {
-			if (type === undefined)
-				type = 'default'
-			const config = this.fetchConfig(guild)
-			const channel = config.loggerChannels.get(type)
-			if (channel === undefined) {
-				if (type === 'default')
-					return reject(type)
-				return this.fetchLogChannel(guild).catch(_type => reject(type))
-			}
-			return resolve(channel)
-		})
+	public async fetchLogChannel(guild: Guild, type: LogChannelType = 'default'): Promise<TextChannel> {
+
+		const config = this.fetchConfig(guild)
+		const channel = config.loggerChannels.get(type) ?? config.loggerChannels.get('default')
+
+		if (channel === undefined) throw Error('Log channel does not exist')
+
+		return channel
 	}
 
-	
-	public async fetchCommand(cmd?: string): Promise<Command> {
-		return new Promise<Command>((resolve, reject) => {
-			if (cmd === undefined)
-				return reject(cmd)
-			if (this.aliasMap.has(cmd))
-				cmd = this.aliasMap.get(cmd)!
-			const command = this.commands.get(cmd)
-			if (command === undefined)
-				return reject(cmd)
-			return resolve(command)
-		})
+
+	public async fetchCommand(commandName: string): Promise<Command | undefined> {
+		return this.commands.get(this.aliasMap.get(commandName) ?? commandName)
 	}
 
 	/**
-	 * Fetches the config file associated with the guild. If the file has not been cached, it is loaded and returned. 
-	 * @param guild 
-	 * @returns The `ConfigFile` object associated with the `guild`
+	 * Fetches the config file associated with the given guild.
+	 * If the file has not been cached, it is loaded and returned. 
 	 */
 	public fetchConfig(guild: Guild): ConfigFile {
-		return this.configs.has(guild.id) ? this.configs.get(guild.id)! : this.loadConfig(guild)
-	}
-
-	public initCommands() {
-		logger.info('Loading Commands')
-		fs.readdirSync('./commands', fileEncoding)
-			.filter(fileName => fileName.endsWith('.js') && !fileName.startsWith('_'))
-			.forEach(fileName => {
-				const command = require(`./commands/${fileName}`).default as Command
-				if (this.commands.has(command.name))
-					throw Error(`Command name collision ${command.name}`)
-				this.commands.set(command.name, command)
-				command.alias.forEach(alias => {
-					if (this.aliasMap.has(alias))
-						throw Error(`alias collision ${alias} for commands ${command.name} and `
-							+ (this.commands.get(this.aliasMap.get(alias) as string) as Command).name)
-					this.aliasMap.set(alias, command.name)
-				})
-			})
+		return this.configs.get(guild.id) ?? this.loadConfig(guild)
 	}
 
 	private loadConfig(guild: Guild): ConfigFile {
-		const data = fs.readFileSync(fs.existsSync(`./configs/${guild.id}.json`) ? `./configs/${guild.id}.json` : './configs/default.json', fileEncoding)
-		const configData = JSON.parse(data)
+		const data = fs.readFileSync(fs.existsSync(`${configsDir}/${guild.id}.json`) ? `${configsDir}/${guild.id}.json` : `${configsDir}/default.json`, fileEncoding)
+		const configData = JSON.parse(data) // TODO use the reviver instead of the mess below
 		const config = configData as ConfigFile
 
 		config.loggerChannels = new Collection<LogChannelType, TextChannel>(configData.loggerChannels instanceof Array ?
@@ -190,12 +152,34 @@ export class DubiousBot extends Discord.Client {
 	}
 
 	public saveConfig(guild: GuildResolvable) {
-		const id = guild instanceof Guild ? guild.id : guild
+		const id: Snowflake = guild instanceof Guild ? guild.id : guild
 		logger.debug(`saving config for guild id ${id}`)
-		let data = JSON.stringify(this.configs.get(id), (_key, value) =>
-			value instanceof Collection ? value.map<[string, string]>((v, k) => [k, v.id])
-				: value instanceof Set ? [...value] : value, '\t')
-		fs.writeFileSync(`./configs/${id}.json`, data)
+		let data = JSON.stringify(
+			this.configs.get(id),
+			(_key, value) => {
+				if (value instanceof Collection) return value.map<[string, string]>((v, k) => [k, v.id])
+				if (value instanceof Set) return [...value]
+				return value
+			},
+			'\t'
+		)
+		fs.writeFileSync(`${configsDir}/${id}.json`, data)
+	}
+
+	public initCommands() {
+		logger.info('Loading Commands')
+		fs.readdirSync(commandDir, fileEncoding)
+			.filter(fileName => fileName.endsWith('.js') && !fileName.startsWith('_'))
+			.forEach(fileName => {
+				const command = require(`${commandDir}/${fileName}`)[fileName] as Command
+				if (this.commands.has(command.name))
+					throw Error(`Command name collision ${command.name}`)
+				this.commands.set(command.name, command)
+				command.alias.forEach(alias => {
+					if (this.aliasMap.has(alias)) throw Error(`alias collision ${alias} for commands ${command.name}`)
+					this.aliasMap.set(alias, command.name)
+				})
+			})
 	}
 }
 

@@ -1,10 +1,10 @@
-import { Command } from "..";
-import { Collection } from "discord.js";
+import { Collection } from "discord.js"
+import { Command, PermissionLevel } from ".."
 
-export default {
+export const reloadCommands: Command = {
 	name: 'reloadcommands',
 	alias: ['rec'],
-	level: 'dev',
+	level: PermissionLevel.developer,
 	desc: 'Reloads all commands and aliases',
 	usage: '',
 	execute: async (_message, _args, _config, client) => {
@@ -12,4 +12,4 @@ export default {
 		client.commands = new Collection<string, Command>()
 		client.initCommands()
 	}
-} as Command
+}

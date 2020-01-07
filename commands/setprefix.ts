@@ -1,9 +1,9 @@
-import { Command, logger } from "..";
+import { Command, logger, PermissionLevel } from ".."
 
-export default {
+export const setPrefix: Command = {
 	name: 'setprefix',
 	alias: ['spf'],
-	level: 'admin',
+	level: PermissionLevel.admin,
 	desc: 'Set the command prefix.',
 	usage: '<prefix>',
 	execute: async (message, args, serverConfig, client) => {
@@ -20,4 +20,4 @@ export default {
 			return resolve()
 		})
 	}
-} as Command
+}

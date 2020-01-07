@@ -1,68 +1,67 @@
-import { Command, logger } from "..";
-import { RichEmbed } from "discord.js";
+import { Command, logger, PermissionLevel } from ".."
+import { RichEmbed } from "discord.js"
 
-export default {
+export const command: Command = {
 	name: 'command',
 	alias: ['cmd'],
-	level: 'admin',
+	level: PermissionLevel.admin,
 	desc: 'Enables or disables commands',
 	usage: '[<enable|disable> <...command-name>]',
 	execute: async (message, args, serverConfig, client) => {
-		return new Promise<void>((resolve, reject) => {
-			if (args.length > 0) {
-				if (args[0] !== 'enable' && args[0] !== 'disable')
-					return reject(`Invalid argument '${args[0]}'`)
-				if (args.length < 2)
-					return reject('Missing required arguments')
+
+		if (args.length === 0) {
+			if (serverConfig.disabledCommands.size === 0) {
+				message.channel.send('There are currently no disabled commands')
+			} else {
+				const embed = new RichEmbed()
+					.setTitle('Disabled Commands')
+					.setDescription([...serverConfig.disabledCommands.values()].join('\n'))
+				message.channel.send(embed)
 			}
+			return
+		}
 
-			if (args.length === 0) {
-				if (serverConfig.disabledCommands.size === 0)
-					message.channel.send('There are currently no disabled commands')
-				else
-					message.channel.send(new RichEmbed().setTitle('Disabled Commands')
-						.setDescription([...serverConfig.disabledCommands.values()].join('\n')))
-				return resolve()
-			}
+		if (args[0] !== 'enable' && args[0] !== 'disable')
+			throw Error(`Invalid argument '${args[0]}'`)
 
-			const embed = new RichEmbed()
-				.setAuthor(message.author.tag, message.author.avatarURL)
-				.setTitle(`${args[0] === 'enable' ? 'Enabled' : 'Disabled'} Commands`)
-				.setFooter(client.user.username, client.user.avatarURL)
-				.setTimestamp(new Date())
+		if (args.length < 2)
+			throw Error('Missing required arguments')
 
-			let cmds = args.slice(1).map(cmd => cmd.toLowerCase())
+		const embed = new RichEmbed()
+			.setAuthor(message.author.tag, message.author.avatarURL)
+			.setTitle(`${args[0] === 'enable' ? 'Enabled' : 'Disabled'} Commands`)
+			.setFooter(client.user.username, client.user.avatarURL)
+			.setTimestamp(new Date())
 
-			embed.setDescription(cmds.map(cmd => {
-				if (client.aliasMap.has(cmd))
-					cmd = client.aliasMap.get(cmd)!
-				if (!client.commands.has(cmd))
-					return (`Unknown command '${cmd}'`)
+		let commandNames = args.slice(1).map(c => c.toLowerCase())
 
-				if (args[0] === 'enable') {
-					if (serverConfig.disabledCommands.has(cmd)) {
-						serverConfig.disabledCommands.delete(cmd)
-						return `${cmd} enabled`
-					}
-					return `${cmd} already enabled`
-				} else {
-					if (cmd === 'command')
-						return 'Are you trying to break me??'
+		embed.setDescription(commandNames.map(commandName => {
+			if (client.aliasMap.has(commandName))
+				commandName = client.aliasMap.get(commandName)!
 
-					if (!serverConfig.disabledCommands.has(cmd)) {
-						serverConfig.disabledCommands.add(cmd)
-						return `${cmd} disabled`
-					}
-					return `${cmd} already disabled`
+			if (!client.commands.has(commandName))
+				return (`Unknown command '${commandName}'`)
+
+			if (args[0] === 'enable') {
+				if (serverConfig.disabledCommands.has(commandName)) {
+					serverConfig.disabledCommands.delete(commandName)
+					return `${commandName} enabled`
 				}
-			}).join('\n'))
+				return `${commandName} already enabled`
+			} else {
+				if (commandName === 'command')
+					return 'Are you trying to break me??'
 
-			message.channel.send(embed)
+				if (!serverConfig.disabledCommands.has(commandName)) {
+					serverConfig.disabledCommands.add(commandName)
+					return `${commandName} disabled`
+				}
+				return `${commandName} already disabled`
+			}
+		}).join('\n'))
 
-			logger.verbose(`${args[0]}d ${args.slice(2).map(cmd => cmd.toLowerCase()).toString()} in server '${message.guild.name}'`)
-			logger.debug(`id:${message.guild.id}`)
-			client.saveConfig(message.guild.id)
-			return resolve()
-		})
+		message.channel.send(embed)
+
+		client.saveConfig(message.guild.id)
 	}
-} as Command
+}

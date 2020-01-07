@@ -21,26 +21,15 @@ export const weightedRandom = (...weights: number[]): number => {
 	throw new Error('weighted random failure')
 }
 
-export const levelcmp = (lhs: PermissionLevelResolvable, rhs: PermissionLevelResolvable, client: DubiousBot): number =>
-	getComputedLevel(lhs, client) - getComputedLevel(rhs, client)
-
-const getComputedLevel = (level: PermissionLevelResolvable, client: DubiousBot): number => {
-	if (level instanceof GuildMember)
-		level = getLevel(level, client)
-
-	switch (level) {
-		case 'user': return 0
-		case 'admin': return 2
-		case 'dev': return 3
-	}
-}
-
-const getLevel = (member: GuildMember, client: DubiousBot): PermissionLevel => {
+/**
+ * Fetches the PermissionLevel for the given member in the respective guild
+ */
+export const fetchLevel = (member: GuildMember, client: DubiousBot): PermissionLevel => {
 	if (member.id === client.auth.developerID)
-		return 'dev'
+		return PermissionLevel.developer
 
 	if (client.fetchConfig(member.guild).adminRoles.keyArray().some(member.roles.has))
-		return 'admin'
+		return PermissionLevel.admin
 
-	return 'user'
+	return PermissionLevel.user
 }

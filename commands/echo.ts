@@ -1,17 +1,15 @@
-import { Command } from "..";
+import { Command, PermissionLevel } from ".."
 
-export default {
+export const echo: Command = {
 	name: 'echo',
 	alias: ['say'],
-	level: 'user',
+	level: PermissionLevel.user,
 	desc: 'Repeats a message back to the user.',
 	usage: '<...message>',
 	execute: async (message, args) => {
-		return new Promise<void>((resolve, reject) => {
-			if (args.length < 1)
-				return reject('Missing required arguments')
-			message.channel.send(args.join(' '))
-			return resolve()
-		})
+		if (args.length < 1)
+			throw Error('Missing required arguments')
+		message.channel.send(args.join(' '))
+		message.delete()
 	}
-} as Command
+}

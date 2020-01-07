@@ -1,14 +1,14 @@
-import { Command, logger } from "..";
+import { Command, logger, PermissionLevel } from ".."
 
-export default {
+export const removeAdminRole: Command = {
 	name: 'removeadminrole',
 	alias: ['radr'],
-	level: 'admin',
+	level: PermissionLevel.admin,
 	desc: 'Revokes a role\'s access to admin commands.\n*Warning: this may revoke admin access from yourself!*',
 	usage: '<...@role>',
 	execute: async (message, _args, serverConfig, client) => {
 		if (message.mentions.roles.size <= 0)
-			return Promise.reject('No roles specified')
+			throw Error('No roles specified')
 
 		message.mentions.roles.forEach(((role, id) => {
 			if (serverConfig.adminRoles.delete(id)) {
@@ -20,6 +20,5 @@ export default {
 			}
 		}))
 		client.saveConfig(message.guild.id)
-		return Promise.resolve()
 	}
-} as Command
+}

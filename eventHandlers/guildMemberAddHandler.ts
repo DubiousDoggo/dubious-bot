@@ -1,25 +1,22 @@
-import { GuildMember, RichEmbed, TextChannel } from "discord.js";
-import { DubiousBot, logger } from "..";
+import { GuildMember, RichEmbed } from "discord.js"
+import { DubiousBot } from ".."
 
-export default async (member: GuildMember, client: DubiousBot) => {
-	return new Promise<void>((resolve, reject) => {
-		const config = client.fetchConfig(member.guild)
-		if (!config.enableLogger)
-			return resolve()
+export const guildMemberAddHandler = async (member: GuildMember, client: DubiousBot): Promise<void> => {
 
-		client.fetchLogChannel(member.guild, 'join')
-			.then(log => {
-				const embed = new RichEmbed()
-					.setAuthor(member.user.tag, member.user.avatarURL)
-					.setTitle('User has joined')
-					.setFooter(client.user.username, client.user.avatarURL)
-					.setTimestamp(new Date())
-					.setColor('AQUA')
-					.setDescription(
-						`\u25baName: ${member.user.tag}\n` +
-						`\u25baJoined: ${member.joinedAt.toUTCString()}`)
+	const config = client.fetchConfig(member.guild)
+	if (!config.enableLogger) return
 
-				return log.send(`${member.user.tag} has joined`, embed)
-			}, type => logger.error(`${type} log channel is not set for ${member.guild.id}!`))
-	})
+	const logChannel = await client.fetchLogChannel(member.guild, 'join')
+
+	const embed = new RichEmbed()
+		.setAuthor(member.user.tag, member.user.avatarURL)
+		.setTitle('User has joined')
+		.setFooter(client.user.username, client.user.avatarURL)
+		.setTimestamp(new Date())
+		.setColor('AQUA')
+		.setDescription(
+			`\u25baName: ${member.user.tag}\n` +
+			`\u25baJoined: ${member.joinedAt.toUTCString()}`)
+
+	logChannel.send(`${member.user.tag} has joined`, embed)
 }
