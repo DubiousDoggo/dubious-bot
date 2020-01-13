@@ -1,6 +1,6 @@
 import { Command, PermissionLevel } from ".."
 
-export const remoceAssignableRole: Command = {
+export default <Command>{
 	name: 'removeassignablerole',
 	alias: ['rasr'],
 	level: PermissionLevel.admin,

@@ -1,4 +1,4 @@
-import Discord, { Collection, Guild, GuildMember, GuildResolvable, Message, Role, Snowflake, TextChannel, ClientDataResolver } from 'discord.js';
+import Discord, { Collection, Guild, GuildMember, GuildResolvable, Message, Role, Snowflake, TextChannel } from 'discord.js';
 import fs from 'fs';
 import winston from 'winston';
 import { guildBanAddHandler } from './eventHandlers/guildBanAddHandler';
@@ -12,9 +12,9 @@ import { roleCreateHandler } from './eventHandlers/roleCreateHandler';
 import { roleDeleteHandler } from './eventHandlers/roleDeleteHandler';
 import { roleUpdateHandler } from './eventHandlers/roleUpdateHandler';
 
+export enum LoggerChannel { default, ban_add, ban_remove, user_join, user_leave, message_delete, message_update }
 export enum PermissionLevel { user, admin, developer }
 export type PermissionLevelResolvable = PermissionLevel | GuildMember
-export type LogChannelType = 'mod' | 'join' | 'message' | 'default'
 
 export interface Command {
 	name: string
@@ -28,7 +28,7 @@ export interface Command {
 export interface ConfigFile {
 	commandPrefix: string
 	enableLogger: boolean
-	loggerChannels: Collection<LogChannelType, TextChannel>
+	loggerChannels: Collection<LoggerChannel, TextChannel>
 	assignableRoles: Collection<Snowflake, Role>
 	adminRoles: Collection<Snowflake, Role>
 	disabledCommands: Set<string>
@@ -54,7 +54,6 @@ export const configsDir = './configs'
 export class DubiousBot extends Discord.Client {
 	auth = JSON.parse(fs.readFileSync('./auth.json', fileEncoding))
 
-	public data_resolver = new ClientDataResolver(this)
 	public aliasMap = new Collection<string, string>()
 	public commands = new Collection<string, Command>()
 
@@ -67,11 +66,6 @@ export class DubiousBot extends Discord.Client {
 		this.on('ready', () => logger.info('Connected').info(`Logged in as: ${this.user.tag}`).debug(`id: ${this.user.id}`))
 		this.on('reconnecting', () => logger.warn('Connection interruped, reconnecting...'))
 		this.on('disconnect', event => (event.wasClean ? logger.info : logger.warn)(`Disconnected ${event.reason}`).debug(`code: ${event.code}`))
-
-		/*
-		this.on('guildCreate', guild => null)
-		this.on('guildDelete', guild => null)
-		*/
 
 		this.on('guildBanAdd', (guild, user) => guildBanAddHandler(guild, user, this).catch(logger.error))
 		this.on('guildBanRemove', (guild, user) => guildBanRemoveHandler(guild, user, this).catch(logger.error))
@@ -96,23 +90,26 @@ export class DubiousBot extends Discord.Client {
 
 		this.on('error', info => logger.error(info))
 		this.on('warn', info => logger.warn(info))
-		this.on('debug', info => (info.includes('heartbeat') ? logger.silly : logger.debug)(info))
+		this.on('debug', info => logger.debug(info))
 	}
 
 	/**
 	 * Fetches the TextChannel in the guild for logging the given type of data 
 	 */
-	public async fetchLogChannel(guild: Guild, type: LogChannelType = 'default'): Promise<TextChannel> {
+	public async fetchLogChannel(guild: Guild, type: LoggerChannel = LoggerChannel.default): Promise<TextChannel> {
 
 		const config = this.fetchConfig(guild)
-		const channel = config.loggerChannels.get(type) ?? config.loggerChannels.get('default')
+		const channel = config.loggerChannels.get(type) ?? config.loggerChannels.get(LoggerChannel.default)
 
-		if (channel === undefined) throw Error('Log channel does not exist')
+		if (channel === undefined)
+			throw Error('Log channel does not exist')
 
 		return channel
 	}
 
-
+	/**
+	 * 
+	 */
 	public async fetchCommand(commandName: string): Promise<Command | undefined> {
 		return this.commands.get(this.aliasMap.get(commandName) ?? commandName)
 	}
@@ -130,9 +127,9 @@ export class DubiousBot extends Discord.Client {
 		const configData = JSON.parse(data) // TODO use the reviver instead of the mess below
 		const config = configData as ConfigFile
 
-		config.loggerChannels = new Collection<LogChannelType, TextChannel>(configData.loggerChannels instanceof Array ?
+		config.loggerChannels = new Collection<LoggerChannel, TextChannel>(configData.loggerChannels instanceof Array ?
 			(configData.loggerChannels as Array<[string, string]>).filter(value => guild.channels.has(value[1]))
-				.map<[LogChannelType, TextChannel]>(value => [value[0] as LogChannelType, guild.channels.get(value[1]) as TextChannel]) : undefined)
+				.map<[LoggerChannel, TextChannel]>(value => [LoggerChannel[value[0] as keyof typeof LoggerChannel], guild.channels.get(value[1]) as TextChannel]) : undefined)
 
 		config.adminRoles = new Collection<Snowflake, Role>(configData.adminRoles instanceof Array ?
 			(configData.adminRoles as Array<[string, string]>).filter(value => guild.roles.has(value[1]))
@@ -157,8 +154,10 @@ export class DubiousBot extends Discord.Client {
 		let data = JSON.stringify(
 			this.configs.get(id),
 			(_key, value) => {
-				if (value instanceof Collection) return value.map<[string, string]>((v, k) => [k, v.id])
-				if (value instanceof Set) return [...value]
+				if (value instanceof Collection)
+					return value.map<[string, string]>((v, k) => [k, v.id])
+				if (value instanceof Set)
+					return [...value]
 				return value
 			},
 			'\t'
@@ -168,15 +167,18 @@ export class DubiousBot extends Discord.Client {
 
 	public initCommands() {
 		logger.info('Loading Commands')
-		fs.readdirSync(commandDir, fileEncoding)
-			.filter(fileName => fileName.endsWith('.js') && !fileName.startsWith('_'))
+		fs.readdirSync(`${__dirname}/${commandDir}`, fileEncoding)
+			.filter(fileName => fileName.endsWith('.js'))
 			.forEach(fileName => {
-				const command = require(`${commandDir}/${fileName}`)[fileName] as Command
+				const command = require(`${__dirname}/${commandDir}/${fileName}`).default as Command
+				if (command === undefined)
+					throw Error(`file ${fileName} has no default export`)
 				if (this.commands.has(command.name))
 					throw Error(`Command name collision ${command.name}`)
 				this.commands.set(command.name, command)
 				command.alias.forEach(alias => {
-					if (this.aliasMap.has(alias)) throw Error(`alias collision ${alias} for commands ${command.name}`)
+					if (this.aliasMap.has(alias))
+						throw Error(`alias collision ${alias} for commands ${command.name}`)
 					this.aliasMap.set(alias, command.name)
 				})
 			})

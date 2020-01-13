@@ -1,8 +1,9 @@
-import { Command, PermissionLevel } from ".."
 import { RichEmbed } from "discord.js"
+import { Command, PermissionLevel } from ".."
+import { InvalidArgumentError } from "../src/Errors"
 import { fetchLevel } from "../src/utils"
 
-export const help: Command = {
+export default <Command>{
 	name: 'help',
 	alias: [],
 	level: PermissionLevel.user,
@@ -11,7 +12,7 @@ export const help: Command = {
 	execute: async (message, args, config, client) => {
 
 		if (args.length > 1)
-			throw Error(`Invalid argument '${args[1]}'`)
+			throw new InvalidArgumentError(args[1])
 
 		if (args.length === 0) {
 			const embed = new RichEmbed()
@@ -29,7 +30,7 @@ export const help: Command = {
 
 		const command = await client.fetchCommand(args[0])
 		if (command === undefined) {
-			message.channel.send(`Unknown command \`'${args[0]}'\`\nType \`${config.commandPrefix}help\` for a list of commands`)
+			message.channel.send(`Unknown command \`${args[0]}\`\nType \`${config.commandPrefix}help\` for a list of commands`)
 			return
 		}
 
@@ -40,7 +41,7 @@ export const help: Command = {
 			.addField('Usage', `${config.commandPrefix}${command.name} ${command.usage}`)
 
 		if (command.level !== PermissionLevel.user)
-			embed.addField('Permissions', `This command is for ${command.level} use only`)
+			embed.addField('Permissions', `This command is for ${PermissionLevel[command.level]} use only`)
 
 		message.channel.send(embed)
 

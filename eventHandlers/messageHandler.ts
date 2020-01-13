@@ -1,14 +1,15 @@
 import { Message, TextChannel } from "discord.js"
 import { DubiousBot } from ".."
-import { escapeTicks, fetchLevel } from "../src/utils"
+import { InvalidArgumentError, MissingArgumentError } from "../src/Errors"
+import { fetchLevel } from "../src/utils"
 
 export const messageHandler = async (message: Message, client: DubiousBot): Promise<void> => {
 
-	if (message.author.bot) return
+	if (message.author.bot)
+		return
 
 	if (!(message.channel instanceof TextChannel)) {
-		// TODO status
-		message.channel.send(`Hello, I'm ${client.user.username},\nI'm not set up to hande DMs yet, but you can bother <@${client.auth.developerID}> if you have any issues!`)
+		message.channel.send(`Hello, I'm ${client.user.username},\nI'm not set up to hande DMs, but you can bother <@${client.auth.developerID}> if you have any issues!`)
 		return
 	}
 
@@ -21,12 +22,12 @@ export const messageHandler = async (message: Message, client: DubiousBot): Prom
 		const command = await client.fetchCommand(commandName)
 
 		if (command === undefined) {
-			message.channel.send(`Unknown command ${escapeTicks(commandName)}\nType \`${config.commandPrefix}help\` for a list of commands`)
+			message.channel.send(`Unknown command \`${commandName}\`\nType \`${config.commandPrefix}help\` for a list of commands`)
 			return
 		}
 
 		if (config.disabledCommands.has(command.name)) {
-			message.channel.send(`${command.name} is disabled on this server`)
+			message.channel.send(`\`${command.name}\` is disabled on this server`)
 			return
 		}
 
@@ -37,8 +38,13 @@ export const messageHandler = async (message: Message, client: DubiousBot): Prom
 
 		try {
 			await command.execute(message, args, config, client)
-		} catch (error) { // TODO custom errors
-			message.channel.send(`${error}\nUsage: ${command.name} ${command.usage}`)
+		} catch (error) {
+			if (error instanceof MissingArgumentError)
+				message.channel.send(`Missing required argument,\nUsage: ${command.name} ${command.usage}`)
+			else if (error instanceof InvalidArgumentError)
+				message.channel.send(`Invalid argument \`${error.message}\`\nUsage: \`${command.name} ${command.usage}\``)
+			else
+				throw error
 		}
 
 	} else if (message.isMentioned(client.user)) {

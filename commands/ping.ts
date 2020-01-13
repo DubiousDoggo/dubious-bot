@@ -1,6 +1,6 @@
 import { Command, PermissionLevel } from ".."
 
-export const ping: Command = {
+export default <Command>{
 	name: 'ping',
 	alias: [],
 	level: PermissionLevel.user,

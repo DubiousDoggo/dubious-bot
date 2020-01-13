@@ -1,12 +1,13 @@
 import { GuildMember, RichEmbed } from "discord.js"
-import { DubiousBot } from ".."
+import { DubiousBot, LoggerChannel } from ".."
 
 export const guildMemberRemoveHandler = async (member: GuildMember, client: DubiousBot): Promise<void> => {
 
 	const config = client.fetchConfig(member.guild)
-	if (!config.enableLogger) return
+	if (!config.enableLogger)
+		return
 
-	const logChannel = await client.fetchLogChannel(member.guild, 'join')
+	const logChannel = await client.fetchLogChannel(member.guild, LoggerChannel.user_leave)
 
 	const embed = new RichEmbed()
 		.setAuthor(member.user.tag, member.user.avatarURL)

@@ -1,15 +1,16 @@
 import { Message, RichEmbed } from "discord.js"
-import { DubiousBot } from ".."
+import { DubiousBot, LoggerChannel } from ".."
 import { escapeTicks } from "../src/utils"
 
 export const messageUpdateHandler = async (message: Message, newmessage: Message, client: DubiousBot): Promise<void> => {
 
-	if (newmessage.author === client.user) return
+	if (newmessage.author === client.user)
+		return
 
 	const config = client.fetchConfig(message.guild)
 	if (!config.enableLogger) return
 
-	const logChannel = await client.fetchLogChannel(message.guild, 'message')
+	const logChannel = await client.fetchLogChannel(message.guild, LoggerChannel.message_update)
 
 	const embed = new RichEmbed()
 		.setAuthor(message.author.tag, message.author.avatarURL)

@@ -1,7 +1,7 @@
 import { Collection } from "discord.js"
 import { Command, PermissionLevel } from ".."
 
-export const reloadCommands: Command = {
+export default <Command>{
 	name: 'reloadcommands',
 	alias: ['rec'],
 	level: PermissionLevel.developer,

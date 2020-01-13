@@ -1,13 +1,14 @@
 import { Attachment, Message, RichEmbed } from "discord.js"
-import { DubiousBot } from ".."
+import { DubiousBot, LoggerChannel } from ".."
 import { escapeTicks } from "../src/utils"
 
 export const messageDeleteHandler = async (message: Message, client: DubiousBot): Promise<void> => {
 
 	const config = client.fetchConfig(message.guild)
-	if (!config.enableLogger) return
+	if (!config.enableLogger)
+		return
 
-	const logChannel = await client.fetchLogChannel(message.guild, 'message')
+	const logChannel = await client.fetchLogChannel(message.guild, LoggerChannel.message_delete)
 
 	const embed = new RichEmbed()
 		.setAuthor(message.author.tag, message.author.avatarURL)

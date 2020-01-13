@@ -1,6 +1,7 @@
 import { Command, PermissionLevel } from "..";
+import { InvalidArgumentError } from "../src/Errors";
 
-export const listAssignableRoles: Command = {
+export default <Command>{
 	name: 'listassignableroles',
 	alias: ['lasr'],
 	level: PermissionLevel.user,
@@ -8,7 +9,7 @@ export const listAssignableRoles: Command = {
 	usage: '',
 	execute: async (message, args, serverConfig) => {
 		if (args.length > 0)
-			throw Error(`Invalid argument '${args[0]}'`)
+			throw new InvalidArgumentError(args[0])
 
 		if (serverConfig.assignableRoles.size > 0)
 			message.channel.send('The current assignable roles are\n' +

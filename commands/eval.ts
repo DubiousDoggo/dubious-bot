@@ -1,8 +1,8 @@
 import { Command, PermissionLevel } from ".."
 
-export const execute: Command = {
+export default <Command>{
 	name: 'execute',
-	alias: ['exec'],
+	alias: ['exec', 'eval'],
 	level: PermissionLevel.developer,
 	desc: 'evaluates a javascript expression',
 	usage: '<expression>',

@@ -1,12 +1,13 @@
 import { Guild, RichEmbed, User } from "discord.js"
-import { DubiousBot } from ".."
+import { DubiousBot, LoggerChannel } from ".."
 
 export const guildBanAddHandler = async (guild: Guild, user: User, client: DubiousBot): Promise<void> => {
 
 	const config = client.fetchConfig(guild)
-	if (!config.enableLogger) return
+	if (!config.enableLogger)
+		return
 
-	const logChannel = await client.fetchLogChannel(guild, 'mod')
+	const logChannel = await client.fetchLogChannel(guild, LoggerChannel.ban_add)
 
 	const embed = new RichEmbed()
 		.setAuthor(user.tag, user.avatarURL)

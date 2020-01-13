@@ -1,6 +1,7 @@
-import { Command, logger, PermissionLevel } from ".."
+import { Command, PermissionLevel } from ".."
+import { InvalidArgumentError } from "../src/Errors"
 
-export const clearAssignableRoles: Command = {
+export default <Command>{
 	name: 'clearassignableroles',
 	alias: ['casr'],
 	level: PermissionLevel.admin,
@@ -8,12 +9,10 @@ export const clearAssignableRoles: Command = {
 	usage: '',
 	execute: async (message, args, serverConfig, client) => {
 		if (args.length > 0)
-			throw Error(`Invalid argument '${args[0]}'`)
+			throw new InvalidArgumentError(args[0])
 
 		serverConfig.assignableRoles.deleteAll()
 		message.channel.send('Cleared assignable roles')
-		logger.verbose(`Cleared assignable roles in server '${message.guild.name}'`)
-		logger.debug(`id:${message.guild.id}`)
 		client.saveConfig(message.guild.id)
 	}
 }

@@ -1,7 +1,8 @@
 import { Command, PermissionLevel } from ".."
+import { MissingArgumentError } from "../src/Errors"
 import { humanList } from "../src/utils"
 
-export const giveRole: Command = {
+export default <Command>{
 	name: 'giverole',
 	alias: ['giveroles', 'give'],
 	level: PermissionLevel.user,
@@ -10,7 +11,7 @@ export const giveRole: Command = {
 	execute: async (message, _args, serverConfig) => {
 
 		if (message.mentions.roles.size < 1)
-			throw Error('No roles mentioned')
+			throw new MissingArgumentError('No roles were mentioned')
 
 		const [assign, unassigned] = message.mentions.roles.partition((_role, id) => serverConfig.assignableRoles.has(id))
 

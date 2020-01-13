@@ -1,7 +1,8 @@
-import { Command, logger, PermissionLevel } from ".."
 import { RichEmbed } from "discord.js"
+import { Command, PermissionLevel } from ".."
+import { InvalidArgumentError, MissingArgumentError } from "../src/Errors"
 
-export const command: Command = {
+export default <Command>{
 	name: 'command',
 	alias: ['cmd'],
 	level: PermissionLevel.admin,
@@ -22,10 +23,10 @@ export const command: Command = {
 		}
 
 		if (args[0] !== 'enable' && args[0] !== 'disable')
-			throw Error(`Invalid argument '${args[0]}'`)
+			throw new InvalidArgumentError(args[0])
 
 		if (args.length < 2)
-			throw Error('Missing required arguments')
+			throw new MissingArgumentError()
 
 		const embed = new RichEmbed()
 			.setAuthor(message.author.tag, message.author.avatarURL)

@@ -1,23 +1,20 @@
-import { Command, logger, PermissionLevel } from ".."
+import { Command, PermissionLevel } from ".."
+import { InvalidArgumentError, MissingArgumentError } from "../src/Errors"
 
-export const setPrefix: Command = {
+export default <Command>{
 	name: 'setprefix',
 	alias: ['spf'],
 	level: PermissionLevel.admin,
 	desc: 'Set the command prefix.',
 	usage: '<prefix>',
 	execute: async (message, args, serverConfig, client) => {
-		return new Promise<void>((resolve, reject) => {
-			if (args.length < 1)
-				return reject('Missing required arguments')
-			if (args.length > 1)
-				return reject(`Invalid argument ${args[1]}`)
+		if (args.length < 1)
+			throw new MissingArgumentError()
+		if (args.length > 1)
+			throw new InvalidArgumentError(args[1])
 
-			serverConfig.commandPrefix = args[0]
-			client.saveConfig(message.guild.id)
-			message.channel.send(`Set command prefix to '${args[0]}'`)
-			logger.verbose(`Set command prefix in server ${message.guild.name} to ${args[0]}`)
-			return resolve()
-		})
+		serverConfig.commandPrefix = args[0]
+		client.saveConfig(message.guild.id)
+		message.channel.send(`Set command prefix to \`${args[0]}\``)
 	}
 }

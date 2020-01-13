@@ -1,7 +1,7 @@
 import { Command, PermissionLevel } from ".."
 import { humanList } from "../src/utils"
 
-export const removeRole: Command = {
+export default <Command>{
 	name: 'removerole',
 	alias: ['removeroles', 'rem', 'remrole'],
 	level: PermissionLevel.user,
@@ -18,8 +18,8 @@ export const removeRole: Command = {
 			message.channel.send('All done!')
 		} else {
 			let reply: string = ''
-			let nonassignable = message.mentions.roles.filter((_role, id) => !serverConfig.assignableRoles.has(id))
-			let hasnt = message.mentions.roles.filter((_role, id) => !message.member.roles.has(id) && !nonassignable.has(id))
+			const nonassignable = message.mentions.roles.filter((_role, id) => !serverConfig.assignableRoles.has(id))
+			const hasnt = message.mentions.roles.filter((_role, id) => !message.member.roles.has(id) && !nonassignable.has(id))
 
 			if (hasnt.size !== 0)
 				reply += (`You do not have the role${humanList(hasnt.map(role => role.name), '', '', 'or', '', 's')}`)

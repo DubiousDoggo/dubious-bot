@@ -1,6 +1,6 @@
 import { Command, PermissionLevel } from ".."
 
-export const echo: Command = {
+export default <Command>{
 	name: 'echo',
 	alias: ['say'],
 	level: PermissionLevel.user,

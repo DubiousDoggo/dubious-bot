@@ -1,6 +1,7 @@
-import { Command, PermissionLevel } from ".."
+import { Command, LoggerChannel, PermissionLevel } from ".."
+import { InvalidArgumentError } from "../src/Errors"
 
-export const logger: Command = {
+export default <Command>{
 	name: 'logger',
 	alias: ['log'],
 	level: PermissionLevel.developer,
@@ -13,12 +14,12 @@ export const logger: Command = {
 		}
 
 		if (args[0] !== 'enable' && args[0] !== 'disable')
-			throw Error(`Invalid argument ${args[0]}`)
-		
-		if (args.length > 1)
-			throw Error(`Invalid argument ${args[1]}`)
+			throw new InvalidArgumentError(args[0])
 
-		if (args[0] === 'enable' && !config.loggerChannels.has('default')) {
+		if (args.length > 1)
+			throw new InvalidArgumentError(args[1])
+
+		if (args[0] === 'enable' && !config.loggerChannels.has(LoggerChannel.default)) {
 			message.channel.send(`No channel set for logging\nPlease set a channel with \`${config.commandPrefix}setlog\``)
 			return
 		}
