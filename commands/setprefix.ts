@@ -2,19 +2,19 @@ import { Command, PermissionLevel } from ".."
 import { InvalidArgumentError, MissingArgumentError } from "../src/Errors"
 
 export default <Command>{
-	name: 'setprefix',
-	alias: ['spf'],
-	level: PermissionLevel.admin,
-	desc: 'Set the command prefix.',
-	usage: '<prefix>',
-	execute: async (message, args, serverConfig, client) => {
-		if (args.length < 1)
-			throw new MissingArgumentError()
-		if (args.length > 1)
-			throw new InvalidArgumentError(args[1])
+    name: 'setprefix',
+    alias: ['spf'],
+    level: PermissionLevel.admin,
+    desc: 'Set the command prefix.',
+    usage: '<prefix>',
+    execute: async (message, args, serverConfig, client) => {
+        if (args.length < 1)
+            throw new MissingArgumentError()
+        if (args.length > 1)
+            throw new InvalidArgumentError(args[1])
 
-		serverConfig.commandPrefix = args[0]
-		client.saveConfig(message.guild.id)
-		message.channel.send(`Set command prefix to \`${args[0]}\``)
-	}
+        serverConfig.commandPrefix = args[0]
+        client.saveConfig(message.guild.id)
+        message.channel.send(`Set command prefix to \`${args[0]}\``)
+    }
 }
