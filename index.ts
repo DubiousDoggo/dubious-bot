@@ -182,7 +182,6 @@ export class DubiousBot extends Discord.Client {
     public loadCommands() {
         logger.info('Loading Commands')
         fs.readdirSync(`${__dirname}/${commandDir}`, fileEncoding)
-            .filter(fileName => fileName.endsWith('.js'))
             .forEach(fileName => {
                 const fullName = `${__dirname}/${commandDir}/${fileName}`
                 delete require.cache[require.resolve(fullName)] // force reload the file from disk, needed for reloadcommands
