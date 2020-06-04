@@ -5,8 +5,8 @@ export default <Command>{
     name: 'removeadminrole',
     alias: ['radr'],
     level: PermissionLevel.admin,
-    desc: 'Revokes a role\'s access to admin commands.\n*Warning: this may revoke admin access from yourself!*',
-    usage: '<...@role>',
+    description: 'Revokes a role\'s access to admin commands.\n*Warning: this may revoke admin access from yourself!*',
+    syntax: '<...@role>',
     execute: async (message, _args, serverConfig, client) => {
         if (message.mentions.roles.size <= 0)
             throw new MissingArgumentError('No roles were mentioned')

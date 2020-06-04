@@ -7,8 +7,8 @@ export default <Command>{
     name: 'status',
     alias: [],
     level: PermissionLevel.user,
-    desc: 'Gives a list of things about the bot',
-    usage: '',
+    description: 'Gives a list of things about the bot',
+    syntax: '',
     execute: async (message, args, _config, client) => {
         if (args.length > 0)
             throw new InvalidArgumentError(args[0])

@@ -6,8 +6,8 @@ export default <Command>{
     name: 'command',
     alias: ['cmd'],
     level: PermissionLevel.admin,
-    desc: 'Enables or disables commands',
-    usage: '[<enable|disable> <...command-name>]',
+    description: 'Enables or disables commands',
+    syntax: '[<enable|disable> <...command-name>]',
     execute: async (message, args, serverConfig, client) => {
 
         if (args.length === 0) {

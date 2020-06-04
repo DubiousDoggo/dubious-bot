@@ -7,8 +7,8 @@ export default <Command>{
     name: 'help',
     alias: [],
     level: PermissionLevel.user,
-    desc: 'help! help! somebody! please!',
-    usage: '[<command>]',
+    description: 'help! help! somebody! please!',
+    syntax: '[<command>]',
     execute: async (message, args, config, client) => {
 
         if (args.length > 1)
@@ -22,7 +22,7 @@ export default <Command>{
 
             client.commands
                 .filter(command => !config.disabledCommands.has(command.name) && command.level <= fetchLevel(message.member, client))
-                .forEach(command => embed.addField([command.name, ...command.alias].join(', '), command.desc))
+                .forEach(command => embed.addField([command.name, ...command.alias].join(', '), command.description))
 
             message.channel.send(embed)
             return
@@ -36,9 +36,9 @@ export default <Command>{
 
         const embed = new RichEmbed()
             .setTitle([command.name, ...command.alias].join(', '))
-            .setDescription(command.desc)
+            .setDescription(command.description)
             .setColor('LUMINOUS_VIVID_PINK')
-            .addField('Usage', `${config.commandPrefix}${command.name} ${command.usage}`)
+            .addField('Usage', `${config.commandPrefix}${command.name} ${command.syntax}`)
 
         if (command.level !== PermissionLevel.user)
             embed.addField('Permissions', `This command is for ${PermissionLevel[command.level]} use only`)

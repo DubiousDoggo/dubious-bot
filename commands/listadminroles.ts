@@ -5,8 +5,8 @@ export default <Command>{
     name: 'listadminroles',
     alias: ['ladr'],
     level: PermissionLevel.admin,
-    desc: 'Displays the list of authorized admin roles.',
-    usage: '',
+    description: 'Displays the list of authorized admin roles.',
+    syntax: '',
     execute: async (message, args, serverConfig) => {
         if (args.length > 0)
             throw new InvalidArgumentError(args[0])

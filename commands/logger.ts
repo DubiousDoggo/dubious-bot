@@ -5,8 +5,8 @@ export default <Command>{
     name: 'logger',
     alias: ['log'],
     level: PermissionLevel.developer,
-    desc: 'Enables or disables the logger.',
-    usage: '[<enable|disable>]',
+    description: 'Enables or disables the logger.',
+    syntax: '[<enable|disable>]',
     execute: async (message, args, config, client) => {
         if (args.length === 0) {
             message.channel.send(`The logger is currently ${config.enableLogger ? 'enabled' : 'disabled'}.`)

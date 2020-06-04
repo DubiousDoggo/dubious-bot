@@ -5,8 +5,8 @@ export default <Command>{
     name: 'clearadminroles',
     alias: ['cadr'],
     level: PermissionLevel.admin,
-    desc: 'Clears the list of admin roles.\n*Warning: This command may revoke admin access from yourself.*',
-    usage: '',
+    description: 'Clears the list of admin roles.\n*Warning: This command may revoke admin access from yourself.*',
+    syntax: '',
     execute: async (message, args, serverConfig, client) => {
         if (args.length > 0)
             throw new InvalidArgumentError(args[0])

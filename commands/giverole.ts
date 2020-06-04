@@ -6,8 +6,8 @@ export default <Command>{
     name: 'giverole',
     alias: ['giveroles', 'give'],
     level: PermissionLevel.user,
-    desc: 'Gives the user some roles.\nThe roles mentioned must be in the assignable roles list.',
-    usage: '<...@role>',
+    description: 'Gives the user some roles.\nThe roles mentioned must be in the assignable roles list.',
+    syntax: '<...@role>',
     execute: async (message, _args, serverConfig) => {
 
         if (message.mentions.roles.size < 1)

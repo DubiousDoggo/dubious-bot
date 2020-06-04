@@ -20,8 +20,8 @@ export interface Command {
     name: string
     alias: string[]
     level: PermissionLevel
-    desc: string
-    usage: string
+    description: string
+    syntax: string
     execute: (message: Message, args: string[], config: ConfigFile, client: DubiousBot) => Promise<void>
 }
 

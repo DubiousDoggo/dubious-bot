@@ -4,8 +4,8 @@ export default <Command>{
     name: 'removeassignablerole',
     alias: ['rasr'],
     level: PermissionLevel.admin,
-    desc: 'Removes a role from being self-assignable.',
-    usage: '<...@role>',
+    description: 'Removes a role from being self-assignable.',
+    syntax: '<...@role>',
     execute: async (message, _args, serverConfig, client) => {
         if (message.mentions.roles.size < 1)
             throw Error('No roles mentioned')

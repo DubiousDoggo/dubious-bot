@@ -5,8 +5,8 @@ export default <Command>{
     name: 'listassignableroles',
     alias: ['lasr'],
     level: PermissionLevel.user,
-    desc: 'Lists the roles that a user can assign to themselves',
-    usage: '',
+    description: 'Lists the roles that a user can assign to themselves',
+    syntax: '',
     execute: async (message, args, serverConfig) => {
         if (args.length > 0)
             throw new InvalidArgumentError(args[0])

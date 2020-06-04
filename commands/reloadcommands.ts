@@ -5,8 +5,8 @@ export default <Command>{
     name: 'reloadcommands',
     alias: ['recmd'],
     level: PermissionLevel.developer,
-    desc: 'reloads all commands and aliases',
-    usage: '',
+    description: 'reloads all commands and aliases',
+    syntax: '',
     execute: async (message, _args, _config, client) => {
         client.aliasMap = new Collection<string, string>()
         client.commands = new Collection<string, Command>()

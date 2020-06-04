@@ -5,8 +5,8 @@ export default <Command>{
     name: 'removerole',
     alias: ['removeroles', 'rem', 'remrole'],
     level: PermissionLevel.user,
-    desc: 'Removes roles from the user.\nThe roles mentioned must be in the assignable roles list.',
-    usage: '<...@assignable-role>',
+    description: 'Removes roles from the user.\nThe roles mentioned must be in the assignable roles list.',
+    syntax: '<...@assignable-role>',
     execute: async (message, _args, serverConfig) => {
         if (message.mentions.roles.size < 1)
             throw Error('No roles mentioned')

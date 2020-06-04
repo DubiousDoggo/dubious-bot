@@ -5,8 +5,8 @@ export default <Command>{
     name: 'addassignablerole',
     alias: ['aasr'],
     level: PermissionLevel.admin,
-    desc: 'Adds a role to the list of assignable roles.\nUsers will be able to self-assign and remove the listed roles using the giverole and removerole commands.',
-    usage: '<...@role>',
+    description: 'Adds a role to the list of assignable roles.\nUsers will be able to self-assign and remove the listed roles using the giverole and removerole commands.',
+    syntax: '<...@role>',
     execute: async (message, _args, serverConfig, client) => {
         if (message.mentions.roles.size < 1)
             throw new MissingArgumentError('No roles were mentioned')

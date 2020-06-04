@@ -5,11 +5,12 @@ import { fetchLevel } from "../src/utils"
 
 export const messageHandler = async (message: Message, client: DubiousBot): Promise<void> => {
 
-    if (message.author.bot)
+    if (message.author.bot) {
         return
+    }
 
     if (!(message.channel instanceof TextChannel)) {
-        message.channel.send(`Hello, I'm ${client.user.username},\nI'm not set up to hande DMs, but you can bother <@${client.auth.developerID}> if you have any issues!`)
+        message.channel.send(`Hello, I'm ${client.user.username},\nI'm not set up to hande DMs, but you can bother <@!${client.auth.developerID}> if you have any issues!`)
         return
     }
 
@@ -22,7 +23,7 @@ export const messageHandler = async (message: Message, client: DubiousBot): Prom
         const command = await client.fetchCommand(commandName)
 
         if (command === undefined) {
-            message.channel.send(`Unknown command \`${commandName}\`\nType \`${config.commandPrefix}help\` for a list of commands`)
+            message.channel.send(`Unknown command \`${commandName}\`\nTry \`help\` for a list of commands`)
             return
         }
 
@@ -39,12 +40,13 @@ export const messageHandler = async (message: Message, client: DubiousBot): Prom
         try {
             await command.execute(message, args, config, client)
         } catch (error) {
-            if (error instanceof MissingArgumentError)
-                message.channel.send(`Missing required argument,\nUsage: ${command.name} ${command.usage}`)
-            else if (error instanceof InvalidArgumentError)
-                message.channel.send(`Invalid argument \`${error.message}\`\nUsage: \`${command.name} ${command.usage}\``)
-            else
+            if (error instanceof MissingArgumentError) {
+                message.channel.send(`Missing required argument,\nUsage: ${command.name} ${command.syntax}`)
+            } else if (error instanceof InvalidArgumentError) {
+                message.channel.send(`Invalid argument \`${error.message}\`\nUsage: \`${command.name} ${command.syntax}\``)
+            } else {
                 throw error
+            }
         }
 
     } else if (message.isMentioned(client.user)) {

@@ -6,8 +6,8 @@ export default <Command>{
     name: 'setlog',
     alias: [],
     level: PermissionLevel.developer,
-    desc: `Sets the channel for logging information.\n The availble categories are ${Object.values(LoggerChannel).filter(value => (typeof value === 'string')).join(', ')}`,
-    usage: '<category>',
+    description: `Sets the channel for logging information.\n The availble categories are ${Object.values(LoggerChannel).filter(value => (typeof value === 'string')).join(', ')}`,
+    syntax: '<category>',
     execute: async (message, args, config, client) => {
         if (args.length === 0)
             throw new MissingArgumentError()

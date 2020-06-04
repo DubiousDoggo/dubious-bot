@@ -5,8 +5,8 @@ export default <Command>{
     name: 'setprefix',
     alias: ['spf'],
     level: PermissionLevel.admin,
-    desc: 'Set the command prefix.',
-    usage: '<prefix>',
+    description: 'Set the command prefix.',
+    syntax: '<prefix>',
     execute: async (message, args, serverConfig, client) => {
         if (args.length < 1)
             throw new MissingArgumentError()

@@ -5,8 +5,8 @@ export default <Command>{
     name: 'clearassignableroles',
     alias: ['casr'],
     level: PermissionLevel.admin,
-    desc: 'Clears the list of self-assignable roles.',
-    usage: '',
+    description: 'Clears the list of self-assignable roles.',
+    syntax: '',
     execute: async (message, args, serverConfig, client) => {
         if (args.length > 0)
             throw new InvalidArgumentError(args[0])
