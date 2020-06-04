@@ -19,8 +19,8 @@ export default <Command>{
             .setTimestamp(new Date())
             .setColor('BLUE')
             .addField('Servers', client.guilds.size, true)
-            .addField('Ping', `${client.ping}ms`, true)
-            .addField('Uptime', `${client.uptime}ms`, true)
+            .addField('Ping', `${client.ping.toFixed(1)}ms`, true)
+            .addField('Uptime', `${client.uptime.toFixed(1)}ms`, true)
             .addField('Version', JSON.parse(fs.readFileSync('./package.json', fileEncoding)).version)
         message.channel.send(embed)
     }

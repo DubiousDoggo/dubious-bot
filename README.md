@@ -10,115 +10,115 @@ A discord bot custom made for my servers and friends.
 ### addadminrole
 Adds a role to the list of admin roles.  
 This only gives the role access to admin bot commands, not server access.
->`addadminrole <...@role>`
+> Usage `addadminrole <...@role>`
 
 
 ### addassignablerole
 Adds a role to the list of assignable roles.  
 Users will be able to self-assign and remove the listed roles using the giverole and removerole commands.
->`addassignablerole <...@role>`
+> Usage `addassignablerole <...@role>`
 
 
 ### clearadminroles
 Clears the list of admin roles.  
 *Warning: This command may revoke admin access from yourself.*
->`clearadminroles `
+> Usage `clearadminroles `
 
 
 ### clearassignableroles
 Clears the list of self-assignable roles.
->`clearassignableroles `
+> Usage `clearassignableroles `
 
 
 ### command
 Enables or disables commands
->`command [<enable|disable> <...command-name>]`
+> Usage `command [<enable|disable> <...command-name>]`
 
 
 ### echo
 Repeats a message back to the user.
->`echo <...message>`
+> Usage `echo <...message>`
 
 
 ### execute
 evaluates a javascript expression
->`execute <expression>`
+> Usage `execute <expression>`
 
 
 ### genreadme
 helper script for updating the readme
->`genreadme `
+> Usage `genreadme `
 
 
 ### giverole
 Gives the user some roles.  
 The roles mentioned must be in the assignable roles list.
->`giverole <...@role>`
+> Usage `giverole <...@role>`
 
 
 ### help
 help! help! somebody! please!
->`help [<command>]`
+> Usage `help [<command>]`
 
 
 ### listadminroles
 Displays the list of authorized admin roles.
->`listadminroles `
+> Usage `listadminroles `
 
 
 ### listassignableroles
 Lists the roles that a user can assign to themselves
->`listassignableroles `
+> Usage `listassignableroles `
 
 
 ### logger
 Enables or disables the logger.
->`logger [<enable|disable>]`
+> Usage `logger [<enable|disable>]`
 
 
 ### ping
 Play a friendly game of Ping Pong
->`ping `
+> Usage `ping `
 
 
 ### reloadcommands
 reloads all commands and aliases
->`reloadcommands `
+> Usage `reloadcommands `
 
 
 ### reloadconfig
 reloads the config file for this guild.
->`reloadconfig `
+> Usage `reloadconfig `
 
 
 ### removeadminrole
 Revokes a role's access to admin commands.  
 *Warning: this may revoke admin access from yourself!*
->`removeadminrole <...@role>`
+> Usage `removeadminrole <...@role>`
 
 
 ### removeassignablerole
 Removes a role from being self-assignable.
->`removeassignablerole <...@role>`
+> Usage `removeassignablerole <...@role>`
 
 
 ### removerole
 Removes roles from the user.  
 The roles mentioned must be in the assignable roles list.
->`removerole <...@assignable-role>`
+> Usage `removerole <...@assignable-role>`
 
 
 ### setlog
 Sets the channel for logging information.  
  The availble categories are default, banAdd, banRemove, userJoin, userLeave, messageDelete, messageUpdate
->`setlog <category>`
+> Usage `setlog <category>`
 
 
 ### setprefix
 Set the command prefix.
->`setprefix <prefix>`
+> Usage `setprefix <prefix>`
 
 
 ### status
 Gives a list of things about the bot
->`status `
+> Usage `status `

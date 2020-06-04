@@ -1,8 +1,10 @@
-*.js
-*.json
-*.js.map
-!default.json
-!package.json
-!package-lock.json
 node_modules
+bin
+
+.vscode/*
+!.vscode/launch.json
+
+configs/*
+!configs/default.json
+
 auth.json

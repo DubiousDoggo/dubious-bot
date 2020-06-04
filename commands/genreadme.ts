@@ -6,11 +6,11 @@ export default <Command>{
     level: PermissionLevel.developer,
     description: 'helper script for updating the readme',
     syntax: '',
-    execute: async (message, args, config, client) => {
+    execute: async (message, _args, _config, client) => {
 
         const text = "## Commands\n" +
             client.commands.map(command => `### ${command.name}\n${command.description.replace('\n', '  \n')}`
-                + `\n>\`${command.name} ${command.syntax}\`\n\n`).join('\n')
+                + `\n> Usage \`${command.name} ${command.syntax}\`\n\n`).join('\n')
         console.log(text)
         message.channel.send(`template written to console`)
     }
