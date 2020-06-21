@@ -41,7 +41,7 @@ export const messageHandler = async (message: Message, client: DubiousBot): Prom
             await command.execute(message, args, config, client)
         } catch (error) {
             if (error instanceof MissingArgumentError) {
-                message.channel.send(`Missing required argument,\nUsage: ${command.name} ${command.syntax}`)
+                message.channel.send(`Missing required argument\nUsage: \`${command.name} ${command.syntax}\``)
             } else if (error instanceof InvalidArgumentError) {
                 message.channel.send(`Invalid argument \`${error.message}\`\nUsage: \`${command.name} ${command.syntax}\``)
             } else {

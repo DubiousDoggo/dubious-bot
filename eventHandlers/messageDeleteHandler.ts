@@ -8,7 +8,7 @@ export const messageDeleteHandler = async (message: Message, client: DubiousBot)
     if (!config.enableLogger)
         return
 
-    const logChannel = await client.fetchLogChannel(message.guild, LoggerChannel.messageDelete)
+    const logChannel = await client.fetchLogChannel(message.guild, LoggerChannel.messageDelete, message.author.id)
 
     const embed = new RichEmbed()
         .setAuthor(message.author.tag, message.author.avatarURL)

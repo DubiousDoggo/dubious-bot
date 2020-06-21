@@ -5,13 +5,23 @@ import { escapeTicks } from "../src/utils"
 
 export const messageUpdateHandler = async (message: Message, newmessage: Message, client: DubiousBot): Promise<void> => {
 
-    if (newmessage.author === client.user)
-        return
+    if (newmessage.author === client.user) {
+        return // dont log updates sent by the bot, that would cause another update!
+    }
 
     const config = client.fetchConfig(message.guild)
-    if (!config.enableLogger) return
+    if (!config.enableLogger) {
+        return
+    }
 
-    const logChannel = await client.fetchLogChannel(message.guild, LoggerChannel.messageUpdate)
+    if (newmessage.content === message.content) {
+        if (newmessage.embeds.length > message.embeds.length) {
+            return // only log when embeds are deleted, not added
+        }
+        logger.debug(`message edit ${message.id} looks the same!`)
+    }
+
+    const logChannel = await client.fetchLogChannel(message.guild, LoggerChannel.messageUpdate, message.author.id)
 
     const embed = new RichEmbed()
         .setAuthor(message.author.tag, message.author.avatarURL)
@@ -26,6 +36,4 @@ export const messageUpdateHandler = async (message: Message, newmessage: Message
 
     logChannel.send(`Message was updated in <#${message.channel.id}>`, embed)
 
-    if (message.content === newmessage.content)
-        logger.debug(`message edit ${message.id} looks the same`)
 }
