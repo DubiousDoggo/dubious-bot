@@ -30,6 +30,12 @@ Clears the list of self-assignable roles.
 > Usage `clearassignableroles `
 
 
+### clearuserlog
+Unsets the channel for logging specific users' information.  
+The user's logs will still be tracked in the default logging channels.
+> Usage `clearuserlog <@user>`
+
+
 ### command
 Enables or disables commands
 > Usage `command [<enable|disable> <...command-name>]`
@@ -117,6 +123,11 @@ Sets the channel for logging information.
 ### setprefix
 Set the command prefix.
 > Usage `setprefix <prefix>`
+
+
+### setuserlog
+Sets the channel for logging specific users' information.
+> Usage `setuserlog <@user>`
 
 
 ### status
