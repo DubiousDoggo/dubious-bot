@@ -1,68 +1,68 @@
-import { Command, logger } from "..";
-import { RichEmbed } from "discord.js";
+import { RichEmbed } from "discord.js"
+import { Command, PermissionLevel } from ".."
+import { InvalidArgumentError, MissingArgumentError } from "../src/Errors"
 
-export default {
-	name: 'command',
-	alias: ['cmd'],
-	level: 'admin',
-	desc: 'Enables or disables commands',
-	usage: '[<enable|disable> <...command-name>]',
-	execute: async (message, args, serverConfig, client) => {
-		return new Promise<void>((resolve, reject) => {
-			if (args.length > 0) {
-				if (args[0] !== 'enable' && args[0] !== 'disable')
-					return reject(`Invalid argument '${args[0]}'`)
-				if (args.length < 2)
-					return reject('Missing required arguments')
-			}
+export default <Command>{
+    name: 'command',
+    alias: ['cmd'],
+    level: PermissionLevel.admin,
+    description: 'Enables or disables commands',
+    syntax: '[<enable|disable> <...command-name>]',
+    execute: async (message, args, serverConfig, client) => {
 
-			if (args.length === 0) {
-				if (serverConfig.disabledCommands.size === 0)
-					message.channel.send('There are currently no disabled commands')
-				else
-					message.channel.send(new RichEmbed().setTitle('Disabled Commands')
-						.setDescription([...serverConfig.disabledCommands.values()].join('\n')))
-				return resolve()
-			}
+        if (args.length === 0) {
+            if (serverConfig.disabledCommands.size === 0) {
+                message.channel.send('There are currently no disabled commands')
+            } else {
+                const embed = new RichEmbed()
+                    .setTitle('Disabled Commands')
+                    .setDescription([...serverConfig.disabledCommands.values()].join('\n'))
+                message.channel.send(embed)
+            }
+            return
+        }
 
-			const embed = new RichEmbed()
-				.setAuthor(message.author.tag, message.author.avatarURL)
-				.setTitle(`${args[0] === 'enable' ? 'Enabled' : 'Disabled'} Commands`)
-				.setFooter(client.user.username, client.user.avatarURL)
-				.setTimestamp(new Date())
+        if (args[0] !== 'enable' && args[0] !== 'disable')
+            throw new InvalidArgumentError(args[0])
 
-			let cmds = args.slice(1).map(cmd => cmd.toLowerCase())
+        if (args.length < 2)
+            throw new MissingArgumentError()
 
-			embed.setDescription(cmds.map(cmd => {
-				if (client.aliasMap.has(cmd))
-					cmd = client.aliasMap.get(cmd)!
-				if (!client.commands.has(cmd))
-					return (`Unknown command '${cmd}'`)
+        const embed = new RichEmbed()
+            .setAuthor(message.author.tag, message.author.avatarURL)
+            .setTitle(`${args[0] === 'enable' ? 'Enabled' : 'Disabled'} Commands`)
+            .setFooter(client.user.username, client.user.avatarURL)
+            .setTimestamp(new Date())
 
-				if (args[0] === 'enable') {
-					if (serverConfig.disabledCommands.has(cmd)) {
-						serverConfig.disabledCommands.delete(cmd)
-						return `${cmd} enabled`
-					}
-					return `${cmd} already enabled`
-				} else {
-					if (cmd === 'command')
-						return 'Are you trying to break me??'
+        let commandNames = args.slice(1).map(c => c.toLowerCase())
 
-					if (!serverConfig.disabledCommands.has(cmd)) {
-						serverConfig.disabledCommands.add(cmd)
-						return `${cmd} disabled`
-					}
-					return `${cmd} already disabled`
-				}
-			}).join('\n'))
+        embed.setDescription(commandNames.map(commandName => {
+            if (client.aliasMap.has(commandName))
+                commandName = client.aliasMap.get(commandName)!
 
-			message.channel.send(embed)
+            if (!client.commands.has(commandName))
+                return (`Unknown command '${commandName}'`)
 
-			logger.verbose(`${args[0]}d ${args.slice(2).map(cmd => cmd.toLowerCase()).toString()} in server '${message.guild.name}'`)
-			logger.debug(`id:${message.guild.id}`)
-			client.saveConfig(message.guild.id)
-			return resolve()
-		})
-	}
-} as Command
+            if (args[0] === 'enable') {
+                if (serverConfig.disabledCommands.has(commandName)) {
+                    serverConfig.disabledCommands.delete(commandName)
+                    return `${commandName} enabled`
+                }
+                return `${commandName} already enabled`
+            } else {
+                if (commandName === 'command')
+                    return 'Are you trying to break me??'
+
+                if (!serverConfig.disabledCommands.has(commandName)) {
+                    serverConfig.disabledCommands.add(commandName)
+                    return `${commandName} disabled`
+                }
+                return `${commandName} already disabled`
+            }
+        }).join('\n'))
+
+        message.channel.send(embed)
+
+        client.saveConfig(message.guild.id)
+    }
+}

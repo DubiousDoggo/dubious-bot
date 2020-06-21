@@ -1,22 +1,18 @@
-import { Command, logger } from "..";
+import { Command, PermissionLevel } from "..";
+import { InvalidArgumentError } from "../src/Errors";
 
-export default {
-	name: 'clearadminroles',
-	alias: ['cadr'],
-	level: 'admin',
-	desc: 'Clears the list of admin roles.\n*Warning: This command may revoke admin access from yourself.*',
-	usage: '',
-	execute: async (message, args, serverConfig, client) => {
-		return new Promise<void>((resolve, reject) => {
-			if (args.length > 0)
-				return reject(`Invalid argument '${args[0]}'`)
-		
-			serverConfig.adminRoles.deleteAll()
-			message.channel.send('Cleared admin roles')
-			logger.verbose(`Cleared admin roles in server '${message.guild.name}'`)
-			logger.debug(`id:${message.guild.id}`)
-			client.saveConfig(message.guild.id)	
-			return resolve()
-		})		
-	}
-} as Command
+export default <Command>{
+    name: 'clearadminroles',
+    alias: ['cadr'],
+    level: PermissionLevel.admin,
+    description: 'Clears the list of admin roles.\n*Warning: This command may revoke admin access from yourself.*',
+    syntax: '',
+    execute: async (message, args, serverConfig, client) => {
+        if (args.length > 0)
+            throw new InvalidArgumentError(args[0])
+
+        serverConfig.adminRoles.deleteAll()
+        message.channel.send('Cleared admin roles')
+        client.saveConfig(message.guild.id)
+    }
+}

@@ -1,36 +1,56 @@
-import { Message, TextChannel } from "discord.js";
-import { DubiousBot } from "..";
-import { escapeTicks, levelcmp } from "../src/utils";
+import { Message, TextChannel } from "discord.js"
+import { DubiousBot } from ".."
+import { InvalidArgumentError, MissingArgumentError } from "../src/Errors"
+import { fetchLevel } from "../src/utils"
 
-export default async (message: Message, client: DubiousBot) => {
-	return new Promise<void>((resolve, _reject) => {
-		if (message.author.bot)
-			return resolve()
+export const messageHandler = async (message: Message, client: DubiousBot): Promise<void> => {
 
-		if (!(message.channel instanceof TextChannel))
-			return message.channel.send(`Hello, I'm ${client.user.username}\n` +
-				`I'm not set up to hande DMs, but you can go bother <@${client.auth.developerID}> to fix stuff if you want`)
+    if (message.author.bot) {
+        return
+    }
 
-		const config = client.fetchConfig(message.guild)
+    if (!(message.channel instanceof TextChannel)) {
+        message.channel.send(`Hello, I'm ${client.user.username},\nI'm not set up to hande DMs, but you can bother <@!${client.auth.developerID}> if you have any issues!`)
+        return
+    }
 
-		if (message.content.startsWith(config.commandPrefix)) {
-			let args = message.content.substring(config.commandPrefix.length).split(' ')
-			return client.fetchCommand(args.shift()).then(command => {
+    const config = client.fetchConfig(message.guild)
 
-				if (config.disabledCommands.has(command.name))
-					return message.channel.send(`${command.name} is disabled on this server`)
+    if (message.content.startsWith(config.commandPrefix)) {
 
-				if (levelcmp(command.level, message.member, client) > 0)
-					return message.channel.send(`This command if for ${command.level} use only`)
+        const [commandName, ...args] = message.content.substring(config.commandPrefix.length).split(' ')
 
-				return command.execute(message, args, config, client)
-					.catch(reason => message.channel.send(`${reason}\nUsage: ${command.name} ${command.usage}`))
+        const command = await client.fetchCommand(commandName)
 
-			}).catch(cmd => message.channel.send(`Unknown command ${escapeTicks(cmd)}\n` +
-				`Type \`${config.commandPrefix}help\` for a list of commands`))
+        if (command === undefined) {
+            message.channel.send(`Unknown command \`${commandName}\`\nTry \`help\` for a list of commands`)
+            return
+        }
 
-		} else if (message.isMentioned(client.user)) {
-			return message.channel.send(`Hello, I'm ${client.user.username}\nPlease type \`${config.commandPrefix}help\` for a list of available commands`)
-		}
-	})
+        if (config.disabledCommands.has(command.name)) {
+            message.channel.send(`\`${command.name}\` is disabled on this server`)
+            return
+        }
+
+        if (command.level > fetchLevel(message.member, client)) {
+            message.channel.send(`This command if for ${command.level} use only`)
+            return
+        }
+
+        try {
+            await command.execute(message, args, config, client)
+        } catch (error) {
+            if (error instanceof MissingArgumentError) {
+                message.channel.send(`Missing required argument\nUsage: \`${command.name} ${command.syntax}\``)
+            } else if (error instanceof InvalidArgumentError) {
+                message.channel.send(`Invalid argument \`${error.message}\`\nUsage: \`${command.name} ${command.syntax}\``)
+            } else {
+                throw error
+            }
+        }
+
+    } else if (message.isMentioned(client.user)) {
+        message.channel.send(`Hello, I'm ${client.user.username}!\nType \`${config.commandPrefix}help\` for a list of available commands`)
+    }
+
 }

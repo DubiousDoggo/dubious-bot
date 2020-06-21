@@ -1,25 +1,23 @@
-import { TextChannel } from "discord.js";
-import { Command, LogChannelType } from "..";
+import { TextChannel } from "discord.js"
+import { Command, LoggerChannel, PermissionLevel } from ".."
+import { InvalidArgumentError, MissingArgumentError } from "../src/Errors"
 
-export default {
-	name: 'setlog',
-	alias: [],
-	level: 'dev',
-	desc: 'Sets the channel for logging information.',
-	usage: '[<message|join|mod|default>]',
-	execute: async (message, args, config, client) => {
-		return new Promise<void>((resolve, reject) => {
-			if (args.length > 0) {
-				if (args[0] !== 'message' && args[0] !== 'join' && args[0] !== 'mod' && args[0] !== 'default')
-					return reject(`Invalid Argument ${args[0]}`)
-			} else
-				args[0] = 'default'
+export default <Command>{
+    name: 'setlog',
+    alias: [],
+    level: PermissionLevel.developer,
+    description: `Sets the channel for logging information.\n The availble categories are ${Object.values(LoggerChannel).filter(value => (typeof value === 'string')).join(', ')}`,
+    syntax: '<category>',
+    execute: async (message, args, config, client) => {
+        if (args.length === 0)
+            throw new MissingArgumentError()
 
-			config.loggerChannels.set(args[0] as LogChannelType, message.channel as TextChannel)
+        if (!(args[0] in LoggerChannel))
+            throw new InvalidArgumentError(args[0])
 
-			client.saveConfig(message.guild.id)
-
-			return resolve()
-		})
-	}
-} as Command
+        const logType: LoggerChannel = LoggerChannel[args[0] as keyof typeof LoggerChannel]
+        config.loggerChannels.set(logType, message.channel as TextChannel)
+        client.saveConfig(message.guild.id)
+        message.channel.send(`set \`${args[0]}\` logging channel to <#${message.channel.id}>`)
+    }
+}

@@ -1,34 +1,30 @@
-import { Command } from "..";
+import { Command, LoggerChannel, PermissionLevel } from ".."
+import { InvalidArgumentError } from "../src/Errors"
 
-export default {
-	name: 'logger',
-	alias: ['log'],
-	level: 'dev',
-	desc: 'Enables or disables the logger.',
-	usage: '[<enable|disable>]',
-	execute: async (message, args, config, client) => {
-		return new Promise<void>((resolve, reject) => {
-			if (args.length > 0) {
-				if (args[0] !== 'enable' && args[0] !== 'disable')
-					return reject(`Invalid argument ${args[0]}`)
-				if (args.length > 1)
-					return reject(`Invalid argument ${args[1]}`)
-			}
+export default <Command>{
+    name: 'logger',
+    alias: ['log'],
+    level: PermissionLevel.developer,
+    description: 'Enables or disables the logger.',
+    syntax: '[<enable|disable>]',
+    execute: async (message, args, config, client) => {
+        if (args.length === 0) {
+            message.channel.send(`The logger is currently ${config.enableLogger ? 'enabled' : 'disabled'}.`)
+            return
+        }
 
-			if (args.length === 0) {
-				message.channel.send(`The logger is currently ${config.enableLogger ? 'enabled' : 'disabled'}.`)
-				return resolve()
-			}
+        if (args[0] !== 'enable' && args[0] !== 'disable')
+            throw new InvalidArgumentError(args[0])
 
-			if (args[0] === 'enable' && !config.loggerChannels.has('default')) {
-				message.channel.send(`No channel set for logging\nPlease set a channel with \`${config.commandPrefix}setlog\``)
-				return resolve()
-			}
+        if (args.length > 1)
+            throw new InvalidArgumentError(args[1])
 
-			config.enableLogger = (args[0] === 'enable')
-			client.saveConfig(message.guild.id)
+        if (args[0] === 'enable' && !config.loggerChannels.has(LoggerChannel.default)) {
+            message.channel.send(`No channel set for logging\nPlease set a channel with \`${config.commandPrefix}setlog\``)
+            return
+        }
 
-			return resolve()
-		})
-	}
-} as Command
+        config.enableLogger = (args[0] === 'enable')
+        client.saveConfig(message.guild.id)
+    }
+}

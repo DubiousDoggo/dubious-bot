@@ -8,12 +8,13 @@
   "author": "Dubious Doggo",
   "dependencies": {
     "bufferutil": "^4.0.0",
-    "discord.js": "github:discordjs/discord.js#11.5-dev",
+    "discord.js": "11.5.1",
     "lodash": "^4.17.15",
-    "typescript": "^3.3.3333",
+    "typescript": "^3.7.4",
     "winston": "^3.0.0"
   },
   "devDependencies": {
-    "@types/node": "^10.14.1"
+    "@types/node": "^10.14.1",
+    "ts-node": "^8.10.2"
   }
 }

@@ -1,19 +1,15 @@
-import { Role } from "discord.js";
-import { DubiousBot } from "..";
+import { Role } from "discord.js"
+import { DubiousBot } from ".."
 
-export default (role: Role, client: DubiousBot) => {
-	return new Promise<void>((resolve, reject) => {
-		let config = client.fetchConfig(role.guild)
-		
-		if (config.adminRoles.delete(role.id) || config.assignableRoles.delete(role.id))
-			client.saveConfig(role.guild.id)
+export const roleDeleteHandler = async (role: Role, client: DubiousBot): Promise<void> => {
 
-		if (!config.enableLogger)
-			return resolve()
+    let config = client.fetchConfig(role.guild)
 
-		//TODO log
+    if (config.adminRoles.delete(role.id) || config.assignableRoles.delete(role.id))
+        client.saveConfig(role.guild.id)
 
-		return resolve()
-	})
+    if (!config.enableLogger)
+        return
 
+    //TODO log
 }

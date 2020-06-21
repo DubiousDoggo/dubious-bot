@@ -1,22 +1,18 @@
-import { Command, logger } from "..";
+import { Command, PermissionLevel } from ".."
+import { InvalidArgumentError } from "../src/Errors"
 
-export default {
-	name: 'clearassignableroles',
-	alias: ['casr'],
-	level: 'admin',
-	desc: 'Clears the list of self-assignable roles.',
-	usage: '',
-	execute: async (message, args, serverConfig, client) => {
-		return new Promise<void>((resolve, reject) => {
-			if (args.length > 0) 
-				return reject(`Invalid argument '${args[0]}'`)
+export default <Command>{
+    name: 'clearassignableroles',
+    alias: ['casr'],
+    level: PermissionLevel.admin,
+    description: 'Clears the list of self-assignable roles.',
+    syntax: '',
+    execute: async (message, args, serverConfig, client) => {
+        if (args.length > 0)
+            throw new InvalidArgumentError(args[0])
 
-			serverConfig.assignableRoles.deleteAll()
-			message.channel.send('Cleared assignable roles')
-			logger.verbose(`Cleared assignable roles in server '${message.guild.name}'`)
-			logger.debug(`id:${message.guild.id}`)
-			client.saveConfig(message.guild.id)
-			return resolve()
-		})
-	}
-} as Command
+        serverConfig.assignableRoles.deleteAll()
+        message.channel.send('Cleared assignable roles')
+        client.saveConfig(message.guild.id)
+    }
+}

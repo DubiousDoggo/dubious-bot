@@ -1,12 +1,12 @@
-import { Command } from "..";
+import { Command, PermissionLevel } from ".."
 
-export default {
-	name: 'ping',
-	alias: [],
-	level: 'user',
-	desc: 'Play a friendly game of Ping Pong',
-	usage: '',
-	execute: async (message, _args, _config, client) => {
-		return new Promise<void>(_resolve => message.channel.send(`Pong! ${client.ping}ms`))
-	}
-} as Command
+export default <Command>{
+    name: 'ping',
+    alias: [],
+    level: PermissionLevel.user,
+    description: 'Play a friendly game of Ping Pong',
+    syntax: '',
+    execute: async (message, _args, _config, client) => {
+        message.channel.send(`Pong! ${client.ping.toFixed(1)}ms`)
+    }
+}

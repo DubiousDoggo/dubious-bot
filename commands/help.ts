@@ -1,52 +1,49 @@
-import { Command } from "..";
-import { RichEmbed } from "discord.js";
-import { levelcmp } from "../src/utils";
+import { RichEmbed } from "discord.js"
+import { Command, PermissionLevel } from ".."
+import { InvalidArgumentError } from "../src/Errors"
+import { fetchLevel } from "../src/utils"
 
-export default {
-	name: 'help',
-	alias: [],
-	level: 'user',
-	desc: 'help! help! somebody! please!',
-	usage: '[<command>]',
+export default <Command>{
+    name: 'help',
+    alias: [],
+    level: PermissionLevel.user,
+    description: 'help! help! somebody! please!',
+    syntax: '[<command>]',
+    execute: async (message, args, config, client) => {
 
-	execute: async (message, args, config, client) => {
-		return new Promise<void>((resolve, reject) => {
-			if (args.length > 1)
-				return reject(`Invalid argument '${args[1]}'`)
+        if (args.length > 1)
+            throw new InvalidArgumentError(args[1])
 
-			if (args.length === 0) {
-				let embed = new RichEmbed()
-					.setTitle('Here is the list of available commands')
-					.setThumbnail(message.guild.iconURL)
-					.setColor('LUMINOUS_VIVID_PINK')
+        if (args.length === 0) {
+            const embed = new RichEmbed()
+                .setTitle('Here is the list of available commands')
+                .setThumbnail(message.guild.iconURL)
+                .setColor('LUMINOUS_VIVID_PINK')
 
-				client.commands
-					.filter(command => !config.disabledCommands.has(command.name) && levelcmp(command.level, message.member, client) <= 0)
-					.forEach(command => embed.addField(`${[command.name, ...command.alias].join(', ')}`, command.desc))
-				message.channel.send(embed)
-				return resolve()
-			}
+            client.commands
+                .filter(command => !config.disabledCommands.has(command.name) && command.level <= fetchLevel(message.member, client))
+                .forEach(command => embed.addField([command.name, ...command.alias].join(', '), command.description))
 
-			if (client.aliasMap.has(args[0]))
-				args[0] = client.aliasMap.get(args[0]) as string
+            message.channel.send(embed)
+            return
+        }
 
-			if (client.commands.has(args[0])) {
-				let command = (client.commands.get(args[0]) as Command)
+        const command = await client.fetchCommand(args[0])
+        if (command === undefined) {
+            message.channel.send(`Unknown command \`${args[0]}\`\nType \`${config.commandPrefix}help\` for a list of commands`)
+            return
+        }
 
-				let reply = `${[command.name, ...command.alias].join(', ')}\n${command.desc}`
+        const embed = new RichEmbed()
+            .setTitle([command.name, ...command.alias].join(', '))
+            .setDescription(command.description)
+            .setColor('LUMINOUS_VIVID_PINK')
+            .addField('Usage', `${config.commandPrefix}${command.name} ${command.syntax}`)
 
-				if (command.level != 'user')
-					reply += (`\nThis command is for ${command.level} use only`)
+        if (command.level !== PermissionLevel.user)
+            embed.addField('Permissions', `This command is for ${PermissionLevel[command.level]} use only`)
 
-				reply += (`\nUsage: ${command.name} ${command.usage}`)
+        message.channel.send(embed)
 
-				message.channel.send(reply)
-
-			} else {
-				message.channel.send(`Unknown command '${args[0]}'\nType ${config.commandPrefix}help for a list of comands`)
-			}
-			return resolve()
-		})
-	}
-} as Command
-
+    }
+}
