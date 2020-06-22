@@ -1,6 +1,6 @@
 import { Message, TextChannel } from "discord.js"
 import { DubiousBot } from ".."
-import { InvalidArgumentError, MissingArgumentError } from "../src/Errors"
+import { InvalidArgumentError, MissingArgumentError } from "../src/errors"
 import { fetchLevel } from "../src/utils"
 
 export const messageHandler = async (message: Message, client: DubiousBot): Promise<void> => {

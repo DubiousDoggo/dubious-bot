@@ -1,6 +1,6 @@
 import { RichEmbed } from "discord.js"
 import { Command, PermissionLevel } from ".."
-import { InvalidArgumentError } from "../src/Errors"
+import { InvalidArgumentError } from "../src/errors"
 import { fetchLevel } from "../src/utils"
 
 export default <Command>{

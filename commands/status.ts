@@ -1,7 +1,7 @@
 import { RichEmbed } from "discord.js"
 import fs from 'fs'
 import { Command, fileEncoding, PermissionLevel } from ".."
-import { InvalidArgumentError } from "../src/Errors"
+import { InvalidArgumentError } from "../src/errors"
 
 export default <Command>{
     name: 'status',

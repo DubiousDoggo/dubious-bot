@@ -1,5 +1,5 @@
 import { Command, PermissionLevel } from ".."
-import { InvalidArgumentError } from "../src/Errors"
+import { InvalidArgumentError } from "../src/errors"
 
 export default <Command>{
     name: 'clearassignableroles',
