@@ -1,6 +1,6 @@
 import { TextChannel } from "discord.js"
 import { Command, PermissionLevel } from ".."
-import { InvalidArgumentError, MissingArgumentError } from "../src/Errors"
+import { InvalidArgumentError, MissingArgumentError } from "../src/errors"
 
 export default <Command>{
     name: 'clearuserlog',

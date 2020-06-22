@@ -1,5 +1,5 @@
 import { Command, PermissionLevel } from ".."
-import { MissingArgumentError } from "../src/Errors"
+import { MissingArgumentError } from "../src/errors"
 import { humanList } from "../src/utils"
 
 export default <Command>{
