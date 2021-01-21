@@ -1,4 +1,4 @@
-import { Guild, RichEmbed, User } from "discord.js"
+import { Guild, MessageEmbed, User } from "discord.js"
 import { DubiousBot, LoggerChannel } from ".."
 
 export const guildBanAddHandler = async (guild: Guild, user: User, client: DubiousBot): Promise<void> => {
@@ -9,10 +9,10 @@ export const guildBanAddHandler = async (guild: Guild, user: User, client: Dubio
 
     const logChannel = await client.fetchLogChannel(guild, LoggerChannel.banAdd)
 
-    const embed = new RichEmbed()
-        .setAuthor(user.tag, user.avatarURL)
+    const embed = new MessageEmbed()
+        .setAuthor(user.tag, user.avatarURL() ?? undefined)
         .setTitle('User was banned')
-        .setFooter(client.user.username, client.user.avatarURL)
+        .setFooter(client.user?.username, client.user?.avatarURL() ?? undefined)
         .setTimestamp(new Date())
         .setColor('DARK_RED')
         .setDescription(

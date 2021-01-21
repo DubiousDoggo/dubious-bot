@@ -1,4 +1,4 @@
-import { GuildMember, TextChannel, Role } from "discord.js";
+import { GuildMember } from "discord.js";
 import { DubiousBot, PermissionLevel } from "..";
 
 export const escapeTicks = (str: string) => `\`\u200b${str.replace(/(?<!`)`(?!`)/g, '``')}\u200b\``
@@ -16,7 +16,7 @@ export const fetchLevel = (member: GuildMember, client: DubiousBot): PermissionL
 	if (member.id === client.auth.developerID)
 		return PermissionLevel.developer
 
-	if (client.fetchConfig(member.guild).adminRoles.keyArray().some(member.roles.has))
+	if (client.fetchConfig(member.guild).adminRoles.keyArray().some(member.roles.cache.has))
 		return PermissionLevel.admin
 
 	return PermissionLevel.user

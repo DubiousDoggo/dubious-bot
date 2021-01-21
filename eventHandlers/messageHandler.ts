@@ -1,5 +1,5 @@
 import { Message, TextChannel } from "discord.js"
-import { DubiousBot } from ".."
+import { DubiousBot, logger } from ".."
 import { InvalidArgumentError, MissingArgumentError } from "../src/errors"
 import { fetchLevel } from "../src/utils"
 
@@ -10,7 +10,11 @@ export const messageHandler = async (message: Message, client: DubiousBot): Prom
     }
 
     if (!(message.channel instanceof TextChannel)) {
-        message.channel.send(`Hello, I'm ${client.user.username},\nI'm not set up to hande DMs, but you can bother <@!${client.auth.developerID}> if you have any issues!`)
+        message.channel.send(`Hello, I'm ${client.user?.username},\nI'm not set up to hande DMs, but you can bother <@!${client.auth.developerID}> if you have any issues!`)
+        return
+    }
+    if (message.guild === null) {
+        logger.error(`Message ${message.id} has no guild!`)
         return
     }
 
@@ -32,7 +36,7 @@ export const messageHandler = async (message: Message, client: DubiousBot): Prom
             return
         }
 
-        if (command.level > fetchLevel(message.member, client)) {
+        if (message.member === null || command.level > fetchLevel(message.member, client)) {
             message.channel.send(`This command if for ${command.level} use only`)
             return
         }
@@ -49,8 +53,8 @@ export const messageHandler = async (message: Message, client: DubiousBot): Prom
             }
         }
 
-    } else if (message.isMentioned(client.user)) {
-        message.channel.send(`Hello, I'm ${client.user.username}!\nType \`${config.commandPrefix}help\` for a list of available commands`)
+    } else if (client.user !== null && message.mentions.has(client.user)) {
+        message.channel.send(`Hello, I'm ${client.user?.username}!\nType \`${config.commandPrefix}help\` for a list of available commands`)
     }
 
 }

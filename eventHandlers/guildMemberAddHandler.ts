@@ -1,4 +1,4 @@
-import { GuildMember, RichEmbed } from "discord.js"
+import { GuildMember, MessageEmbed } from "discord.js"
 import { DubiousBot, LoggerChannel } from ".."
 
 export const guildMemberAddHandler = async (member: GuildMember, client: DubiousBot): Promise<void> => {
@@ -9,15 +9,15 @@ export const guildMemberAddHandler = async (member: GuildMember, client: Dubious
 
     const logChannel = await client.fetchLogChannel(member.guild, LoggerChannel.userJoin)
 
-    const embed = new RichEmbed()
-        .setAuthor(member.user.tag, member.user.avatarURL)
+    const embed = new MessageEmbed()
+        .setAuthor(member.user.tag, member.user?.avatarURL() ?? undefined)
         .setTitle('User has joined')
-        .setFooter(client.user.username, client.user.avatarURL)
+        .setFooter(client.user?.username, client.user?.avatarURL() ?? undefined)
         .setTimestamp(new Date())
         .setColor('AQUA')
         .setDescription(
             `\u25baName: ${member.user.tag}\n` +
-            `\u25baJoined: ${member.joinedAt.toUTCString()}`)
+            `\u25baJoined: ${member.joinedAt?.toUTCString()}`)
 
     logChannel.send(`${member.user.tag} has joined`, embed)
 }

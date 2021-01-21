@@ -22,12 +22,12 @@ export interface Command {
     level: PermissionLevel
     description: string
     syntax: string
-    execute: (message: Message, args: string[], config: ConfigFile, client: DubiousBot) => Promise<void>
+    execute: (message: Message, args: string[], config: Config, client: DubiousBot) => Promise<void>
 }
 
 export const configVersion = 1
-export interface ConfigFile {
-    version: number
+export interface Config {
+    readonly version: number
     commandPrefix: string
     enableLogger: boolean
     loggerChannels: Collection<LoggerChannel, TextChannel>
@@ -55,18 +55,19 @@ export const commandDir = './commands'
 export const configsDir = './configs'
 
 export class DubiousBot extends Discord.Client {
+
     auth = JSON.parse(fs.readFileSync('./auth.json', fileEncoding))
 
     public aliasMap = new Collection<string, string>()
     public commands = new Collection<string, Command>()
 
-    private configs = new Collection<Snowflake, ConfigFile>()
+    private configs = new Collection<Snowflake, Config>()
 
     constructor() {
-        super()
+        super({ partials: ['USER', 'CHANNEL', 'GUILD_MEMBER', 'MESSAGE', 'REACTION'] })
         this.loadCommands()
 
-        this.on('ready', () => logger.info('Connected').info(`Logged in as: ${this.user.tag}`).debug(`id: ${this.user.id}`))
+        this.on('ready', () => logger.info('Connected').info(`Logged in as: ${this.user?.tag}`).debug(`id: ${this.user?.id}`))
         this.on('reconnecting', () => logger.warn('Connection interruped, reconnecting...'))
         this.on('disconnect', event => (event.wasClean ? logger.info : logger.warn)(`Disconnected ${event.reason}`).debug(`code: ${event.code}`))
 
@@ -128,7 +129,7 @@ export class DubiousBot extends Discord.Client {
      * Fetches the config file associated with the given guild.
      * If the file has not been cached, it is loaded and returned.
      */
-    public fetchConfig(guild: Guild): ConfigFile {
+    public fetchConfig(guild: Guild): Config {
         return this.configs.get(guild.id) ?? this.loadConfig(guild)
     }
 
@@ -138,52 +139,59 @@ export class DubiousBot extends Discord.Client {
      * It is recomended to use fetchConfig instead of loadConfig, unless the
      * uncached config is required.
      */
-    public loadConfig(guild: Guild): ConfigFile {
-        const data = fs.readFileSync(fs.existsSync(`${configsDir}/${guild.id}.json`) ? `${configsDir}/${guild.id}.json` : `${configsDir}/default.json`, fileEncoding)
-        let configData = JSON.parse(data)
+    public loadConfig(guild: Guild): Config {
+        let data = JSON.parse(fs.readFileSync(fs.existsSync(`${configsDir}/${guild.id}.json`) ? `${configsDir}/${guild.id}.json` : `${configsDir}/default.json`, fileEncoding))
 
-        if (configData.version !== configVersion) {
+        if (data.version !== configVersion) {
             logger.info(`guild ${guild.id} has outdated config`)
-            configData = JSON.parse(fs.readFileSync(`${configsDir}/default.json`, fileEncoding))
+            data = JSON.parse(fs.readFileSync(`${configsDir}/default.json`, fileEncoding))
         }
 
-        const config = configData as ConfigFile
+        const guildConfig = data as Config
 
-        config.loggerChannels = new Collection<LoggerChannel, TextChannel>(configData.loggerChannels instanceof Array ?
-            (configData.loggerChannels as Array<[number, string]>)
-                .filter(value => guild.channels.has(value[1]))
-                .map<[LoggerChannel, TextChannel]>(([key, value]) => [key as LoggerChannel, guild.channels.get(value) as TextChannel])
+        guildConfig.loggerChannels = new Collection<LoggerChannel, TextChannel>(data.loggerChannels instanceof Array ?
+            (data.loggerChannels as Array<[number, string]>)
+                .filter(value => guild.channels.resolve(value[1])?.isText() ?? false)
+                .map<[LoggerChannel, TextChannel]>(([key, value]) => [key as LoggerChannel, guild.channels.resolve(value) as TextChannel])
             : undefined)
 
-        config.userLogChannels = new Collection<Snowflake, TextChannel>(configData.userLogChannels instanceof Array ?
-            (configData.userLogChannels as Array<[string, string]>)
-                .filter(value => guild.channels.has(value[1]))
-                .map<[Snowflake, TextChannel]>(([key, value]) => [key, guild.channels.get(value) as TextChannel])
+        guildConfig.userLogChannels = new Collection<Snowflake, TextChannel>(data.userLogChannels instanceof Array ?
+            (data.userLogChannels as Array<[string, string]>)
+                .filter(value => guild.channels.resolve(value[1])?.isText() ?? false)
+                .map<[Snowflake, TextChannel]>(([key, value]) => [key, guild.channels.resolve(value) as TextChannel])
             : undefined)
 
-        config.adminRoles = new Collection<Snowflake, Role>(configData.adminRoles instanceof Array ?
-            (configData.adminRoles as Array<[string, string]>)
-                .filter(value => guild.roles.has(value[1]))
-                .map<[Snowflake, Role]>(([key, value]) => [key, guild.roles.get(value) as Role])
-            : undefined)
+        const adminRoles = data.adminRoles
+        if (adminRoles instanceof Array)
+            guildConfig.adminRoles = new Collection<Snowflake, Role>(
+                adminRoles
+                    .map<[Snowflake, Role | null]>(id => [id, guild.roles.resolve(id)])
+                    .filter<[Snowflake, Role]>((value): value is [Snowflake, Role] => value[1] !== null)
+            )
+        else
+            guildConfig.adminRoles = new Collection()
 
-        config.assignableRoles = new Collection<Snowflake, Role>(configData.assignableRoles instanceof Array ?
-            (configData.assignableRoles as Array<[string, string]>)
-                .filter(value => guild.roles.has(value[1]))
-                .map<[Snowflake, Role]>(([key, value]) => [key, guild.roles.get(value) as Role])
-            : undefined)
+        const assignableRoles = data.assignableRoles
+        if (assignableRoles instanceof Array)
+            guildConfig.assignableRoles = new Collection<Snowflake, Role>(
+                assignableRoles
+                    .map<[Snowflake, Role | null]>(id => [id, guild.roles.resolve(id)])
+                    .filter<[Snowflake, Role]>((value): value is [Snowflake, Role] => value[1] !== null)
+            )
+        else
+            guildConfig.assignableRoles = new Collection()
 
-        config.disabledCommands = new Set(configData.disabledCommands)
+        guildConfig.disabledCommands = new Set(data.disabledCommands)
 
-        this.configs.set(guild.id, config)
+        this.configs.set(guild.id, guildConfig)
         logger.debug(`loaded config for guild id ${guild.id}`)
 
         this.saveConfig(guild.id)
-        return config
+        return guildConfig
     }
 
 
-    public saveConfig(guild: GuildResolvable) {
+    public saveConfig(guild: Guild | Snowflake) {
         const id: Snowflake = guild instanceof Guild ? guild.id : guild
         logger.debug(`saving config for guild id ${id}`)
         let data = JSON.stringify(
